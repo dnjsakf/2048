@@ -1,0 +1,11 @@
+config/database.py
+config/smtp.py
+
+logs/*.log
+
+__pycache__
+*.pyc
+**/drivers/*
+
+.venv
+.vscode
