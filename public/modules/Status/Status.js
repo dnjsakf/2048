@@ -3,8 +3,8 @@
 const Status = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
-  const datas = {}
-  const insts = {}
+  const datas = Object.assign({}, _config.datas);
+  const insts = Object.assign({}, _config.insts);
   const doms = {}
   
   self.el = _el;
@@ -52,8 +52,12 @@ Status.prototype = (function(){
     `;
     self.el.innerHTML = html;
 
-    const mode = self.el.querySelector(".status.mode").StatusMode({})
-    const score = self.el.querySelector(".status.score").StatusScore({});
+    const mode = self.el.querySelector(".status.mode").StatusMode({
+      parent: self
+    })
+    const score = self.el.querySelector(".status.score").StatusScore({
+      parent: self
+    });
 
     self.setInst("mode", mode);
     self.setInst("score", score);

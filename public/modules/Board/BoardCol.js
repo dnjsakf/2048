@@ -58,13 +58,6 @@ BoardCol.prototype = (function(){
 
     self.el.style.width = size+"px";
     self.el.style.height = size+"px";
-    
-    // const paddingLeft = 5*index;
-    // const paddingTop = 5*pIndex;
-
-    // self.el.style.left = (size*(index-1))+"px";
-    // self.el.style.top =   (size*(pIndex-1))+"px";
-    // self.el.style.paddingTop = (parseInt(size/2)-15)+"px"
   }
   
   function _initEvent(self){
@@ -88,11 +81,11 @@ BoardCol.prototype = (function(){
       const a = document.createElement("a");
       const text = document.createTextNode(number);
       a.appendChild(text);
-
-      console.log( self.getAlpha(number) );
   
       self.el.style.backgroundColor = `rgba(255, 71, 0, ${self.getAlpha(number)*2}%)`;
       self.el.appendChild(a);
+
+      self.animate(self.el, "pulse");
     }
     
     self.setData("number", number);

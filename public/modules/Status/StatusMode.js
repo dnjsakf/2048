@@ -2,17 +2,18 @@
 
 const StatusMode = function(_config, _el){
   const self = this;
+  const parent = _config.parent;
   const config = Object.assign({}, _config);
-  const datas = {}
-  const insts = {}
+  const datas = Object.assign({}, _config.datas);
+  const insts = Object.assign({}, _config.insts);
   const doms = {}
   
   self.el = _el;
   self.el.instance = self;
 
   self.setConfig = (k,v)=>{ config[k] = v; }
-  self.getConfig = (k)=>config[k];      
-  self.setData = (k,v)=>{ datas[k] = v; }
+  self.getConfig = (k)=>config[k];
+  self.setData = (k,v)=>{ datas[k] = v; parent.setData(k, v); }
   self.getData = (k)=>datas[k];
   self.setInst = (k,v)=>{ insts[k] = v; }
   self.getInst = (k)=>insts[k];
@@ -30,6 +31,8 @@ StatusMode.prototype = (function(){
   }
   
   function _initData(self){
+    const _defaultMode = self.getConfig("defaultMode");
+    
     const modeMapping = [{
       label: "4x4",
       data: 4,
@@ -42,11 +45,10 @@ StatusMode.prototype = (function(){
       data: 6
     }];
 
-    const _defaultMode = self.getConfig("defaultMode");
-    const defaultMode = _defaultMode ? _defaultMode : modeMapping.filter(mapper=>mapper.default);
+    const mode = _defaultMode ? _defaultMode : modeMapping.filter(mapper=>mapper.default)[0];
 
     self.setData("modeMapping", modeMapping);
-    self.setData("defaultMode", defaultMode);
+    self.setData("mode", mode);
   }
   
   function _init(self){
@@ -60,43 +62,56 @@ StatusMode.prototype = (function(){
   function _initRender(self){
     self.el.innerHTML = "";
 
+    const label = document.createElement("a");
+    const labelText = document.createTextNode("mode: ");
+    label.appendChild(labelText);
+
+    self.el.innerHTML = "";
+
     const modeMapping = self.getData("modeMapping");
-    const defaultMode = self.getData("defaultMode");
+    const mode = self.getData("mode");
     
     const select = document.createElement("select");
     select.name = "mode";
     
-    modeMapping.forEach(function(mode){
+    modeMapping.forEach(function(mapper){
       const option = document.createElement("option");
-      const text = document.createTextNode(mode.label);
+      const text = document.createTextNode(mapper.label);
 
-      option.value = mode.data;
+      option.value = mapper.data;
       option.appendChild(text);
-      option.selected = mode.label === defaultMode.label;
+      option.selected = mapper.label === mode.label;
 
       select.appendChild(option);
     });
 
+    self.setDom("select", select);
+
+    self.el.appendChild(label);
     self.el.appendChild(select);
   }
 
   function _initEvent(self){
-    const onChangeMode = function(event){
-      event.preventDefault();
-
-      const board = self.getInst("board");
-
-    }
-    self.el.removeEventListener("change", onChangeMode, false);
-    self.el.addEventListener("change", onChangeMode, false);
+    
   }
   
-  function _setMode(self, mode){
+  function _setMode(self, _mode){
+    const modeMapping = self.getData("modeMapping");
+    const mode = modeMapping.filter(mapper=>mapper.data==_mode)[0];
 
+    console.log( mode );
+
+    self.setData("mode", mode);
   }
 
   function _getMode(self){
 
+  }
+
+  function _handleChangeMode(self, handler){
+    const select = self.getDom("select");
+
+    Common.event.bind(select, "change", handler.bind(self), false);
   }
 
   return {
@@ -108,6 +123,9 @@ StatusMode.prototype = (function(){
     },
     getMode: function(){
       return this.getData("mode");
+    },
+    onChange: function(handler){
+      return _handleChangeMode(this, handler);
     }
   }
 })();

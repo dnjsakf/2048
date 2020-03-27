@@ -33,45 +33,24 @@ Board.prototype = (function(){
   function _validateConfig(self){
     const valid = true;
     
-    const size = self.getConfig("size");
-    if( !size ){
-      console.error("Invalid size option.", size);
-      return false;
-    }
-    
     return valid;
   }
   
   function _initData(self){
     const isMobile = self.isMobile();
 
-    const statusInst = self.getInst("status");
-    const modeInst = statusInst.getInst("mode");
-
-    const defaultMode = modeInst.getData("defaultMode");
-    console.log( defaultMode );
-
-    self.setData("defaultMode", defaultMode);
-
     _sizing(self);
   }
 
   function _sizing(self){
-    const size = self.getConfig("size");
+    const status = self.getInst("status");
 
-    const matrixMapping = {
-      "small": 4,
-      "medium": 5,
-      "large": 6
-    }
+    const matrixSize = status.getData("mode").data;
+    const margin = status.getData("margin");
+    const screen = status.getData("screen");
 
-    const matrixSize = matrixMapping[size];
-
-    const margin = 5+3;
-    const screenSize = self.getConfig("screenSize");
-
-    const boxWidth = parseInt((screenSize.width - (margin*matrixSize)) / matrixSize);
-    const boxHeight = parseInt((screenSize.height - (margin*matrixSize)) / matrixSize);
+    const boxWidth = parseInt((screen.width - (margin*matrixSize)) / matrixSize);
+    const boxHeight = parseInt((screen.height - (margin*matrixSize)) / matrixSize);
 
     const boxSize = boxWidth >= boxHeight ? boxHeight : boxWidth;
 
@@ -136,24 +115,30 @@ Board.prototype = (function(){
 
   function _initEvent(self){
     const onHandleKeyDown = self.handleKeyDown();
-    Common.event.unbind(document, "keydown", onHandleKeyDown, false);
     Common.event.bind(document, "keydown", onHandleKeyDown, false);
     
     const onMouseDown = self.handleMouseDown();
-    Common.event.unbind(self.el, "mousedown", onMouseDown, false);
     Common.event.bind(self.el, "mousedown", onMouseDown, false);
     
     const onTouchDown = self.handleMouseDown();
-    Common.event.unbind(self.el, "touchstart", onTouchDown, {passive:false});
     Common.event.bind(self.el, "touchstart", onTouchDown, {passive:false});
     
     const onMouseUp = self.handleMouseUp();
-    Common.event.unbind(document, "mouseup", onMouseUp, false);
     Common.event.bind(document, "mouseup", onMouseUp, false);
     
     const onTouchUp = self.handleMouseUp();
-    Common.event.unbind(document, "touchend", onTouchUp, {passive:false});
     Common.event.bind(document, "touchend", onTouchUp, {passive:false});
+
+    const status = self.getInst("status");
+    const mode = status.getInst("mode");
+
+    mode.onChange(function(event){
+      this.setMode(event.target.value);
+
+      _init(self);
+
+      event.target.blur();
+    });
   }
   
   function _createNumber(self, count){
@@ -170,8 +155,6 @@ Board.prototype = (function(){
       for(let i=0; i<count; i++){
         const randCol = emptyCols[parseInt(Math.random()*emptyCols.length)];
         randCol.setNumber(defaultNumber);
-
-        self.animate(randCol.el, "pulse");
       }
     }
   }
@@ -209,8 +192,6 @@ Board.prototype = (function(){
     let checker = 0;
     let changer = 0;
     crossedMatrix.forEach(function(row, idx){
-      console.groupCollapsed("row-"+idx);
-      
       const filteredNumbers = row.map(col=>col.getData("number")).filter(number=>!!number).reverse();
       const calcedNumbers = _extractNumber(self, filteredNumbers);      
       
@@ -230,8 +211,6 @@ Board.prototype = (function(){
         }
         checker += 1; 
       });
-      
-      console.groupEnd("row-"+idx);
     });
 
     return checker !== changer;

@@ -56,8 +56,6 @@ Handler.prototype = (function(){
           y: event.clientY
         });
       } else if ( event.type === "touchstart" ) {
-        console.log( event.changedTouches );
-        
         self.setData("focusPos", {
           x: event.changedTouches[0].clientX, 
           y: event.changedTouches[0].clientY
@@ -69,7 +67,6 @@ Handler.prototype = (function(){
   function _handleMouseUp(self, setting){
     return function(event){
       event.preventDefault();
-      console.log( event );
       
       const lock = self.getData("lock");
       const focusPos = self.getData("focusPos");
@@ -80,8 +77,6 @@ Handler.prototype = (function(){
         
         const leftAndRight = focusPos.x - clientX;
         const upAndDown = clientY - focusPos.y;
-        
-        console.log( focusPos, clientX, clientY ); 
         
         let vector = null;
         if( Math.abs(upAndDown) > Math.abs(leftAndRight) ){

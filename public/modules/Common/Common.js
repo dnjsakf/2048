@@ -108,9 +108,20 @@ Common.event = (function(){
     });
     if( binded && binded.length > 0 ){
       const _binded = binded[0];
+
       _binded.target.removeEventListener(_binded.action, _binded.event, args);
       bindings = bindings.filter(function(binding){
-        return JSON.stringify(binding) !== JSON.stringify(_binded)
+
+        const filtering = [
+          binding.target === _binded.target,
+          binding.action === _binded.action,
+          binding.args === _binded.args,
+          binding.event === _binded.event
+        ].reduce(function(prev, crnt){
+          return prev && crnt;
+        });
+        
+        return filtering;
       });
     }
   }
