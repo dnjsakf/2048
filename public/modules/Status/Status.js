@@ -52,9 +52,7 @@ Status.prototype = (function(){
     `;
     self.el.innerHTML = html;
 
-    const mode = self.el.querySelector(".status.mode").StatusMode({
-      size: self.getConfig("size")
-    })
+    const mode = self.el.querySelector(".status.mode").StatusMode({})
     const score = self.el.querySelector(".status.score").StatusScore({});
 
     self.setInst("mode", mode);
@@ -73,6 +71,5 @@ Status.prototype = (function(){
 })();
 
 Common.bindElement(Status, {
-  parent: null,
-  size: "small"
+  parent: null
 });

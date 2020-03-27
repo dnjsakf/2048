@@ -1,14 +1,15 @@
 const root = document.querySelector("#root > .root-wrapper");
 
 const status = document.getElementById("status").Status({
-  size: "small"
+  mode: "4x4"
 });
-const boardInst = document.getElementById("board").Board({
-  size: "small",
+
+const board = document.getElementById("board").Board({
   screenSize: {
     width: root.offsetWidth,
     height: root.offsetHeight-50
   },
-  resize: true
+  insts: {
+    status: status
+  }
 });
-boardInst.setInst("status", status);

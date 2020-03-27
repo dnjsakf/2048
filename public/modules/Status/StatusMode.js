@@ -25,25 +25,28 @@ const StatusMode = function(_config, _el){
 StatusMode.prototype = (function(){
   function _validateConfig(self){
     const valid = true;
-
-    const size = self.getConfig("size");
-    if( !size ){
-      console.error("Invalid size option.", size);
-      return false;
-    }
     
     return valid;
   }
   
   function _initData(self){
-    const size = self.getConfig("size");
-    const modeMapping = {
-      "small": "4x4",
-      "meddium": "6x6",
-      "large": "9x9"
-    }
+    const modeMapping = [{
+      label: "4x4",
+      data: 4,
+      default: true,
+    }, {
+      label: "5x5",
+      data: 5
+    }, {
+      label: "6x6",
+      data: 6
+    }];
+
+    const _defaultMode = self.getConfig("defaultMode");
+    const defaultMode = _defaultMode ? _defaultMode : modeMapping.filter(mapper=>mapper.default);
+
     self.setData("modeMapping", modeMapping);
-    self.setData("mode", modeMapping[size]);
+    self.setData("defaultMode", defaultMode);
   }
   
   function _init(self){
@@ -55,19 +58,45 @@ StatusMode.prototype = (function(){
   }
   
   function _initRender(self){
-    const mode = self.getData("mode");
+    self.el.innerHTML = "";
 
-    self.el.innerHTML = '<a>mode:</a>&nbsp;<a>'+mode+'</a>';
+    const modeMapping = self.getData("modeMapping");
+    const defaultMode = self.getData("defaultMode");
+    
+    const select = document.createElement("select");
+    select.name = "mode";
+    
+    modeMapping.forEach(function(mode){
+      const option = document.createElement("option");
+      const text = document.createTextNode(mode.label);
+
+      option.value = mode.data;
+      option.appendChild(text);
+      option.selected = mode.label === defaultMode.label;
+
+      select.appendChild(option);
+    });
+
+    self.el.appendChild(select);
   }
 
   function _initEvent(self){
-   
+    const onChangeMode = function(event){
+      event.preventDefault();
+
+      const board = self.getInst("board");
+
+    }
+    self.el.removeEventListener("change", onChangeMode, false);
+    self.el.addEventListener("change", onChangeMode, false);
   }
   
   function _setMode(self, mode){
-    self.el.innerHTML = '<a>mode:</a>&nbsp;<a>'+mode+'</a>';
 
-    self.setData("mode", self.getData("modeMapping")[mode]);
+  }
+
+  function _getMode(self){
+
   }
 
   return {

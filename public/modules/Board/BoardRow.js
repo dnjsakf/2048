@@ -1,8 +1,8 @@
 const BoardRow = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
-  const datas = {}
-  const insts = {}
+  const datas = Object.assign({}, _config.datas);
+  const insts = Object.assign({}, _config.insts);
   const doms = {}
   
   self.el = _el;

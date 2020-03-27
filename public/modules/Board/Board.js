@@ -3,8 +3,8 @@
 const Board = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
-  const datas = {}
-  const insts = {}
+  const datas = Object.assign({}, _config.datas);
+  const insts = Object.assign({}, _config.insts);
   const doms = {}
   const status = {
     focus: null,
@@ -45,32 +45,35 @@ Board.prototype = (function(){
   function _initData(self){
     const isMobile = self.isMobile();
 
+    const statusInst = self.getInst("status");
+    const modeInst = statusInst.getInst("mode");
+
+    const defaultMode = modeInst.getData("defaultMode");
+    console.log( defaultMode );
+
+    self.setData("defaultMode", defaultMode);
+
+    _sizing(self);
+  }
+
+  function _sizing(self){
     const size = self.getConfig("size");
+
     const matrixMapping = {
       "small": 4,
-      "medium": 6,
-      "large": 9
-    }
-    const boxSizeMapping = {
-      "small": isMobile ? 60 : 120,
-      "medium": isMobile ? 37 : 75,
-      "large": isMobile ? 25 :50
+      "medium": 5,
+      "large": 6
     }
 
     const matrixSize = matrixMapping[size];
-    let boxSize = boxSizeMapping[size];
 
-    const resize = self.getConfig("resize");
-    if( resize ){
-      const margin = 5+3;
-      const screenSize = self.getConfig("screenSize");
-      console.log( screenSize );
+    const margin = 5+3;
+    const screenSize = self.getConfig("screenSize");
 
-      const boxWidth = parseInt((screenSize.width - (margin*matrixSize)) / matrixSize);
-      const boxHeight = parseInt((screenSize.height - (margin*matrixSize)) / matrixSize);
+    const boxWidth = parseInt((screenSize.width - (margin*matrixSize)) / matrixSize);
+    const boxHeight = parseInt((screenSize.height - (margin*matrixSize)) / matrixSize);
 
-      boxSize = boxWidth >= boxHeight ? boxHeight : boxWidth;
-    }
+    const boxSize = boxWidth >= boxHeight ? boxHeight : boxWidth;
 
     self.setData("matrixSize", matrixSize);
     self.setData("boxSize", boxSize);
@@ -81,8 +84,6 @@ Board.prototype = (function(){
       _initData(self);
       _initRender(self);
       _initEvent(self);
-      
-      _createNumber(self, self.getConfig("defaultCount"));
     }
   }
   
@@ -129,6 +130,8 @@ Board.prototype = (function(){
     self.setData("matrix", matrix);
     
     self.el.appendChild(wrapper);
+
+    _createNumber(self, self.getConfig("defaultCount"));
   }
 
   function _initEvent(self){
@@ -137,12 +140,12 @@ Board.prototype = (function(){
     Common.event.bind(document, "keydown", onHandleKeyDown, false);
     
     const onMouseDown = self.handleMouseDown();
-    Common.event.unbind(document, "mousedown", onMouseDown, false);
-    Common.event.bind(document, "mousedown", onMouseDown, false);
+    Common.event.unbind(self.el, "mousedown", onMouseDown, false);
+    Common.event.bind(self.el, "mousedown", onMouseDown, false);
     
     const onTouchDown = self.handleMouseDown();
-    Common.event.unbind(document, "touchstart", onTouchDown, {passive:false});
-    Common.event.bind(document, "touchstart", onTouchDown, {passive:false});
+    Common.event.unbind(self.el, "touchstart", onTouchDown, {passive:false});
+    Common.event.bind(self.el, "touchstart", onTouchDown, {passive:false});
     
     const onMouseUp = self.handleMouseUp();
     Common.event.unbind(document, "mouseup", onMouseUp, false);
@@ -258,11 +261,6 @@ Board.prototype = (function(){
     }
   }
 
-  function _resizing(self){
-    const resize = self.getConfig("reszie");
-    
-  }
-
   return {
     init: function(){
       _init(this);
@@ -274,14 +272,25 @@ Board.prototype = (function(){
       if( vector ){
         _move(this, vector);
       }
+    },
+    reset: function(config){
+      const self = this;
+      if( config ){
+        const resetConfig = Object.assign({}, initBoardConfig, config);
+        
+        Object.keys(resetConfig).forEach((key)=>self.setConfig(key, resetConfig[key]));
+      }
+      _init(self);
     }
   }
 })();
 
-Common.bindElement(Board, {
+const initBoardConfig = {
   parent: null,
   size: "medium",
   defaultNumber: 2,
   defaultCount: 2,
   resize: true
-});
+}
+
+Common.bindElement(Board, initBoardConfig);

@@ -1,8 +1,8 @@
 const BoardCol = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
-  const datas = {}
-  const insts = {}
+  const datas = Object.assign({}, _config.datas);
+  const insts = Object.assign({}, _config.insts);
   const doms = {}
   
   self.el = _el;
@@ -54,7 +54,7 @@ BoardCol.prototype = (function(){
     const index = self.getConfig("index");
     const size = self.getConfig("size");
     
-    self.el.className = `pannel col r${pIndex} c${index} empty`;
+    self.el.className = `col r${pIndex} c${index} empty`;
 
     self.el.style.width = size+"px";
     self.el.style.height = size+"px";
