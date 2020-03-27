@@ -44,21 +44,36 @@ Board.prototype = (function(){
   
   function _initData(self){
     const isMobile = self.isMobile();
+
     const size = self.getConfig("size");
-    if( size ){
-      const matrixMapping = {
-        "small": 4,
-        "medium": 6,
-        "large": 9
-      }
-      const boxSizeMapping = {
-        "small": isMobile ? 60 : 120,
-        "medium": isMobile ? 37 : 75,
-        "large": isMobile ? 25 :50
-      }
-      self.setData("matrixSize", matrixMapping[size]);
-      self.setData("boxSize", boxSizeMapping[size]);
+    const matrixMapping = {
+      "small": 4,
+      "medium": 6,
+      "large": 9
     }
+    const boxSizeMapping = {
+      "small": isMobile ? 60 : 120,
+      "medium": isMobile ? 37 : 75,
+      "large": isMobile ? 25 :50
+    }
+
+    const matrixSize = matrixMapping[size];
+    let boxSize = boxSizeMapping[size];
+
+    const resize = self.getConfig("resize");
+    if( resize ){
+      const margin = 5+3;
+      const screenSize = self.getConfig("screenSize");
+      console.log( screenSize );
+
+      const boxWidth = parseInt((screenSize.width - (margin*matrixSize)) / matrixSize);
+      const boxHeight = parseInt((screenSize.height - (margin*matrixSize)) / matrixSize);
+
+      boxSize = boxWidth >= boxHeight ? boxHeight : boxWidth;
+    }
+
+    self.setData("matrixSize", matrixSize);
+    self.setData("boxSize", boxSize);
   }
   
   function _init(self){
@@ -73,7 +88,7 @@ Board.prototype = (function(){
   
   function _initRender(self){
     const wrapper = document.createElement("div");
-    wrapper.id = "board_wrapper";
+    wrapper.className = "board-wrapper";
     
     if( self.el.children ){
       Array.from(self.el.children).forEach(children=>children.remove());
@@ -178,19 +193,6 @@ Board.prototype = (function(){
         }
 
         return returnNumber;
-
-        /*
-        const throwNumber = prev === crnt ? crnt+prev : crnt;
-        
-        if( throwNumber === crnt ){
-          storage.push(prev);
-        }
-        if( _idx === numbers.length -1 ){
-          storage.push(throwNumber);
-        }
-        
-        return throwNumber;
-        */
       });
       return storage;
     } else {
@@ -251,10 +253,14 @@ Board.prototype = (function(){
     const scoreInst = self.getInst("status").getInst("score");
     if( create ){
       _createNumber(self, 1);
-      // self.animate(self.el, "move_"+vector);
 
       scoreInst.setMatrixScore(self.getData("matrix"))
     }
+  }
+
+  function _resizing(self){
+    const resize = self.getConfig("reszie");
+    
   }
 
   return {
@@ -276,5 +282,6 @@ Common.bindElement(Board, {
   parent: null,
   size: "medium",
   defaultNumber: 2,
-  defaultCount: 2
+  defaultCount: 2,
+  resize: true
 });

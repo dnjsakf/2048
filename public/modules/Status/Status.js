@@ -43,7 +43,7 @@ Status.prototype = (function(){
   
   function _initRender(self){
     const html = `
-    <div id="status_wrapper">
+    <div class="status-wrapper">
       <ul>
         <li class="status mode"></li>
         <li class="status score"></li>

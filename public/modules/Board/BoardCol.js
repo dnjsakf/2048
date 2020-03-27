@@ -54,10 +54,17 @@ BoardCol.prototype = (function(){
     const index = self.getConfig("index");
     const size = self.getConfig("size");
     
-    self.el.className = `pannel col r${pIndex} c${index} s${size} empty`;
-    self.el.style.left = ((size*(index-1))+(5*index))+"px";
-    self.el.style.top = ((size*(pIndex-1))+(5*pIndex))+"px";
-    self.el.style.paddingTop = (parseInt(size/2)-15)+"px"
+    self.el.className = `pannel col r${pIndex} c${index} empty`;
+
+    self.el.style.width = size+"px";
+    self.el.style.height = size+"px";
+    
+    // const paddingLeft = 5*index;
+    // const paddingTop = 5*pIndex;
+
+    // self.el.style.left = (size*(index-1))+"px";
+    // self.el.style.top =   (size*(pIndex-1))+"px";
+    // self.el.style.paddingTop = (parseInt(size/2)-15)+"px"
   }
   
   function _initEvent(self){

@@ -4,108 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>2048</title>
-  <style type="text/css">
-    * { padding: 0; margin: 0; box-sizing: border-box; }
-    
-    html, body { width: 100%; height: 100%; }
-    #status ul { list-style: none; padding: 0; }
-    #status a { display: inline-block; font-size: 1.2em; }
-    #status a:first-child { width: 60px; font-size: 1.2em; font-weight: bold; }
-    #status a:nth-child(2) { font-size: 1.2em; }
-    
-    @media only screen and (min-width: 641px) {
-      #root { width: 50%; height: 100%; outline: none; margin: 0 auto; }
-
-      #board { margin: 0 auto; }
-      
-      #board .row-wrapper { position: relative; }
-      #board .row-wrapper .pannel.col { position: absolute; font-size: 2em; box-shadow: 0 0 5px 1px rgba(255, 71, 0, 50%) inset; text-align: center; vertical-align: baseline; }
-      
-      .s50 { width: 50px; height: 50px; }
-      .s75 { width: 75px; height: 75px; }
-      .s120 { width: 120px; height: 120px; }
-      .s150 { width: 150px; height: 150px; }
-
-      .m5 { margin-left: 5px; margin-top: 5px; }
-    }
-    
-    @media only screen and (max-width: 640px) {
-      #root { width: 100%; height: 100%; outline: none; }
-
-      #board { margin: 0 auto; }
-      
-      #board .row-wrapper { position: relative; }
-      #board .row-wrapper .pannel.col { position: absolute; font-size: 2em; box-shadow: 0 0 0 1px black inset; text-align: center; vertical-align: baseline; }
-      
-      .s25 { width: 25px; height: 25px; }
-      .s37 { width: 37px; height: 37px; }
-      .s60 { width: 60px; height: 60px; }
-      .s75 { width: 75px; height: 75px; }
-
-      .m5 { margin-left: 2px; margin-top: 2px; }
-    }
-
-    .animated { animation-fill-mode: both; }
-    .animated.ms300 { animation-duration: 300ms; }
-    .animated.ms500 { animation-duration: 500ms; }
-
-    .move_up{ animation-name: move_up; }
-    .move_down{ animation-name: move_down; }
-    .move_left{ animation-name: move_left; }
-    .move_right{ animation-name: move_right; }
-    .pulse { animation-name: pulse; }
-    
-    @keyframes move_up {
-      0% { transform: translateY(0) }
-      50% { transform: translateY(-5px) }
-      100% { transform: translateY(0) }
-    }
-    @keyframes move_down {
-      0% { transform: translateY(0) }
-      50% { transform: translateY(5px) }
-      100% { transform: translateY(0) }
-    }
-    @keyframes move_left {
-      0% { transform: translateX(0) }
-      50% { transform: translateX(-5px) }
-      100% { transform: translateX(0) }
-    }
-    @keyframes move_right {
-      0% { transform: translateX(0) }
-      50% { transform: translateX(5px) }
-      100% { transform: translateX(0) }
-    }
-    @keyframes pulse {
-      0% { transform: scale3d(0.8, 0.8, 0.8); }
-      /* 50% { transform: scale3d(1.2, 1.2, 1.2); } */
-      100% { transform: scale3d(1, 1, 1); }
-    }
-  </style>
+  <link href="{{ url_for('static', filename='css/common.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/animations.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/2048.css') }}" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
 </head>
 <body>
   <div id="root">
-    <div id="status"></div>
-    <div id="board"></div>
+    <div class="root-wrapper">
+      <div id="status"></div>
+      <div id="board"></div>
+    </div>
   </div>
-  <script src="./js/common.js"></script>
-  <script src="./modules/Handler/Handler.js"></script>
+  <script src="{{ url_for('static', filename='modules/Common/Common.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/Handler/Handler.js') }}"></script>
 
-  <script src="./modules/Status/StatusScore.js"></script>
-  <script src="./modules/Status/StatusMode.js"></script>
-  <script src="./modules/Status/Status.js"></script>
-
-  <script src="./modules/Board/BoardCol.js"></script>
-  <script src="./modules/Board/BoardRow.js"></script>
-  <script src="./modules/Board/Board.js"></script>
-  <script type="text/javascript">
-    const status = document.getElementById("status").Status({
-      size: "small"
-    });
-    const boardInst = document.getElementById("board").Board({
-      size: "small"
-    });
-    boardInst.setInst("status", status);
-  </script>
+  <script src="{{ url_for('static', filename='modules/Status/StatusScore.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/Status/StatusMode.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/Status/Status.js') }}"></script>
+  
+  <script src="{{ url_for('static', filename='modules/Board/BoardCol.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/Board/BoardRow.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/Board/Board.js') }}"></script>
+  
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
 </body>
 </html>

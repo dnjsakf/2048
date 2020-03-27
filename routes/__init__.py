@@ -26,8 +26,4 @@ def createApp(env="dev"):
 def load_routes(app):
   from routes import common
   
-  @app.route("/", methods=["GET"])
-  def getIndex():
-    return render_template('index.html')
-  
   return app
