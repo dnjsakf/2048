@@ -1,13 +1,7 @@
-const root = document.querySelector("#root > .root-wrapper");
-
 const status = document.getElementById("status").Status({
-  mode: "4x4",
-  datas: {
-    screen: {
-      width: root.offsetWidth,
-      height: root.offsetHeight-50
-    },
-    margin: 5+3
+  mode: "3x3",
+  doms: {
+    screen: document.querySelector("#root > .root-wrapper")
   }
 });
 

@@ -16,7 +16,7 @@ class MongoDbDecorator(object):
       def wrapper(*args, **kwargs):
         conn = Connector.connect("mongo")
 
-        return func(conn[database][document], *args, **kwargs)
+        return func(*args, **kwargs)
       return wrapper
     return decorator
 
@@ -63,12 +63,8 @@ class MongoDbDecorator(object):
           cond = {}
 
         items = conn[database][document].aggregate([
-          {
-            "$match": cond
-          },
-          {
-            "$count": "count"
-          }
+          { "$match": cond },
+          { "$count": "count" }
         ])
 
         count = 0
@@ -83,7 +79,7 @@ class MongoDbDecorator(object):
     return decorator
 
   @classmethod
-  def select(cls, database=None, document=None):
+  def select(cls, database=None, document=None, schema=None):
     def decorator(func):
       @wraps(func)
       def wrapper(*args, **kwargs):
@@ -98,28 +94,36 @@ class MongoDbDecorator(object):
         else:
           items = [items]
 
+        if len(items) and schema is not None:
+          items = schema(many=True).load(items)
+
         logger.info("count: {}".format(len(items)))
-
-        if kwargs.get("columns") == True:
-          columns = [ key for pipe in pipeline if "$project" in pipe for key in pipe["$project"] ]
-          logger.info("columns: {}".format(columns))
-
-          return ( items, columns )
-        else:
-          return items
+        
+        return items
       return wrapper
     return decorator
 
   @classmethod
-  def insert(cls, func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-      result = func(*args, **kwargs)
+  def insert_one(cls, database=None, document=None, schema=None):
+    def decorator(func):
+      @wraps(func)
+      def wrapper(*args, **kwargs):
+        conn = Connector.connect("mongo")
 
-      logger.info("inserted: {}".format(result))
+        info = func(*args, **kwargs)
+        if schema is not None:
+          info = schema().load(info)
 
-      return result
-    return wrapper
+        obj_id = conn[database][document].insert(info)
+        if( obj_id ):
+          obj_id = str(obj_id)
+        
+        logger.info("inserted: {}".format( obj_id ))
+
+        return obj_id
+
+      return wrapper
+    return decorator
 
 
   @classmethod

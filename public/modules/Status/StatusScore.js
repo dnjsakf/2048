@@ -6,14 +6,14 @@ const StatusScore = function(_config, _el){
   const config = Object.assign({}, _config);
   const datas = Object.assign({}, _config.datas);
   const insts = Object.assign({}, _config.insts);
-  const doms = {}
+  const doms = Object.assign({}, _config.doms);
   
   self.el = _el;
   self.el.instance = self;
 
   self.setConfig = (k,v)=>{ config[k] = v; }
   self.getConfig = (k)=>config[k];
-  self.setData = (k,v)=>{ datas[k] = v; parent.setData(k, v); }
+  self.setData = (k,v)=>{ datas[k] = v; }
   self.getData = (k)=>datas[k];
   self.setInst = (k,v)=>{ insts[k] = v; }
   self.getInst = (k)=>insts[k];

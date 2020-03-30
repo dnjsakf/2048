@@ -27,6 +27,23 @@ Common.prototype = (function(){
     return number > 2 ? _getAlpha(number/2, ++count) : count
   }
 
+  function _crossArray(array, cross, reverse){
+    const crossedMatrix = cross ? array.map(function(row){
+      return row.map(function(){
+        return Array();
+      });
+    }) : array;
+    
+    if( cross ){
+      array.forEach(function(row, rowIdx){
+        row.forEach(function(col, colIdx){
+          crossedMatrix[colIdx][rowIdx] = col;
+        });
+      });
+    }
+    return reverse ? crossedMatrix.map(row=>[].concat(row).reverse()) : crossedMatrix;
+  }
+
   return {
     isMobile: function(){
       return _isMobile();
@@ -36,6 +53,9 @@ Common.prototype = (function(){
     },
     getAlpha: function(number){
       return _getAlpha(number, 1);
+    },
+    crossArray: function(array, corss, reverse){
+      return _crossArray(array, corss, reverse);
     }
   }
 })();
@@ -106,23 +126,27 @@ Common.event = (function(){
     const binded = bindings.filter(function(binding){
       return binding.target === el && binding.action === action;
     });
+
     if( binded && binded.length > 0 ){
+      const rebined = [];
       const _binded = binded[0];
 
-      _binded.target.removeEventListener(_binded.action, _binded.event, args);
-      bindings = bindings.filter(function(binding){
-
+      bindings.forEach(function(binding){
         const filtering = [
           binding.target === _binded.target,
           binding.action === _binded.action,
-          binding.args === _binded.args,
-          binding.event === _binded.event
         ].reduce(function(prev, crnt){
           return prev && crnt;
         });
-        
+
+        if( filtering ){
+          _binded.target.removeEventListener(_binded.action, _binded.event, args);
+        } else {
+          rebined.push( binding );
+        }
         return filtering;
       });
+      bindings = rebined;
     }
   }
 

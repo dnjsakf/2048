@@ -3,7 +3,7 @@ const BoardRow = function(_config, _el){
   const config = Object.assign({}, _config);
   const datas = Object.assign({}, _config.datas);
   const insts = Object.assign({}, _config.insts);
-  const doms = {}
+  const doms = Object.assign({}, _config.doms);
   
   self.el = _el;
   self.el.instance = self;
@@ -47,7 +47,7 @@ BoardRow.prototype = (function(){
     const wrapper = document.createElement("div");
     wrapper.className = "row-wrapper";
 
-    self.el.className = `pannel row r${index}`;
+    self.el.className = `board-row r${index}`;
     self.el.appendChild(wrapper);
 
     self.setDom("wrapper", wrapper);

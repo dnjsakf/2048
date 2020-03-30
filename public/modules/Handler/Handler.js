@@ -47,8 +47,6 @@ Handler.prototype = (function(){
   
   function _handleMouseDown(self, setting){
     return function(event){
-      event.preventDefault(); 
-      
       self.setData("lock", true);
       if( event.type === "mousedown" ){
         self.setData("focusPos", {
@@ -67,37 +65,38 @@ Handler.prototype = (function(){
   function _handleMouseUp(self, setting){
     return function(event){
       event.preventDefault();
-      
-      const lock = self.getData("lock");
-      const focusPos = self.getData("focusPos");
-      
-      if( lock && focusPos ){
-        let clientX = ( event.type === "touchend" ? event.changedTouches[0].clientX : event.clientX );
-        let clientY = ( event.type === "touchend" ? event.changedTouches[0].clientY : event.clientY );
+
+      if( self.move ){
+        const lock = self.getData("lock");
+        const focusPos = self.getData("focusPos");
         
-        const leftAndRight = focusPos.x - clientX;
-        const upAndDown = clientY - focusPos.y;
-        
-        let vector = null;
-        if( Math.abs(upAndDown) > Math.abs(leftAndRight) ){
-          if( upAndDown > 0 ){  
-            vector = "down";
-          } else if ( upAndDown < 0 ) {
-            vector = "up";  
+        if( lock && focusPos ){
+          let clientX = ( event.type === "touchend" ? event.changedTouches[0].clientX : event.clientX );
+          let clientY = ( event.type === "touchend" ? event.changedTouches[0].clientY : event.clientY );
+          
+          const leftAndRight = focusPos.x - clientX;
+          const upAndDown = clientY - focusPos.y;
+
+          let vector = null;
+          if( Math.abs(upAndDown) > Math.abs(leftAndRight) ){
+            if( upAndDown > 0 ){  
+              vector = "down";
+            } else if ( upAndDown < 0 ) {
+              vector = "up";  
+            }
+          } else if ( Math.abs(upAndDown) < Math.abs(leftAndRight) ){
+            if( leftAndRight > 0 ){  
+              vector = "left";
+            } else if ( leftAndRight < 0 ) {
+              vector = "right";  
+            }
           }
-        } else if ( Math.abs(upAndDown) < Math.abs(leftAndRight) ){
-          if( leftAndRight > 0 ){  
-            vector = "left";
-          } else if ( leftAndRight < 0 ) {
-            vector = "right";  
+          
+          if( vector ){
+            self.move(vector);
           }
         }
-        
-        if( vector ){
-          self.move(vector);
-        }
-      }
-      
+      }      
       self.setData("lock", false);
       self.setData("focusPos", null);
     }

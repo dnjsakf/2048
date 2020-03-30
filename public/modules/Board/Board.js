@@ -5,11 +5,7 @@ const Board = function(_config, _el){
   const config = Object.assign({}, _config);
   const datas = Object.assign({}, _config.datas);
   const insts = Object.assign({}, _config.insts);
-  const doms = {}
-  const status = {
-    focus: null,
-    lock: false
-  }
+  const doms = Object.assign({}, _config.doms);
   
   self.el = _el;
   self.el.instance = self;
@@ -22,9 +18,6 @@ const Board = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-  self.setStatus = (k,v)=>{ status[k] = v; }
-  self.getStatus = (k)=>status[k];
-  self.getAllStatus = ()=>status;
 
   Common.extends.bind(self)([Common, Handler]);
 }
@@ -37,25 +30,6 @@ Board.prototype = (function(){
   }
   
   function _initData(self){
-    const isMobile = self.isMobile();
-
-    _sizing(self);
-  }
-
-  function _sizing(self){
-    const status = self.getInst("status");
-
-    const matrixSize = status.getData("mode").data;
-    const margin = status.getData("margin");
-    const screen = status.getData("screen");
-
-    const boxWidth = parseInt((screen.width - (margin*matrixSize)) / matrixSize);
-    const boxHeight = parseInt((screen.height - (margin*matrixSize)) / matrixSize);
-
-    const boxSize = boxWidth >= boxHeight ? boxHeight : boxWidth;
-
-    self.setData("matrixSize", matrixSize);
-    self.setData("boxSize", boxSize);
   }
   
   function _init(self){
@@ -63,6 +37,9 @@ Board.prototype = (function(){
       _initData(self);
       _initRender(self);
       _initEvent(self);
+
+      const defaultCount = self.getConfig("defaultCount"); 
+      _createNumber(self, defaultCount);
     }
   }
   
@@ -74,9 +51,9 @@ Board.prototype = (function(){
       Array.from(self.el.children).forEach(children=>children.remove());
     }
   
-    const matrixSize = self.getData("matrixSize");
+    const size = self.getInst("status").getSize();
     const matrix = [];
-    const rows = Array(matrixSize).fill(1).map(function(rowInc, rowIdx){
+    const rows = Array(size.matrix).fill(1).map(function(rowInc, rowIdx){
       const rowIndex = rowIdx+rowInc;
       const row = document.createElement("div").BoardRow({
         parent: self.el,
@@ -84,13 +61,13 @@ Board.prototype = (function(){
         id: "r"+rowIndex
       });
       
-      const cols = Array(matrixSize).fill(1).map(function(colInc, colIdx){
+      const cols = Array(size.matrix).fill(1).map(function(colInc, colIdx){
         const colIndex = colIdx+colInc;
         const col = document.createElement("div").BoardCol({
           parent: row,
           index: colIndex,
           id: "c"+colIndex,
-          size: self.getData("boxSize")
+          size: size.box
         });
 
         return col;
@@ -109,8 +86,6 @@ Board.prototype = (function(){
     self.setData("matrix", matrix);
     
     self.el.appendChild(wrapper);
-
-    _createNumber(self, self.getConfig("defaultCount"));
   }
 
   function _initEvent(self){
@@ -130,17 +105,28 @@ Board.prototype = (function(){
     Common.event.bind(document, "touchend", onTouchUp, {passive:false});
 
     const status = self.getInst("status");
-    const mode = status.getInst("mode");
-
-    mode.onChange(function(event){
+    status.getInst("mode").onChange(function(event){
       this.setMode(event.target.value);
 
       _init(self);
 
       event.target.blur();
     });
+    
+    if( !self.isMobile() ){
+      Common.event.bind(window, "resize", _handleResize(self), false);
+    }
   }
-  
+
+  function _handleResize(self){
+    const status = self.getInst("status");
+    const matrix = self.getData("matrix");
+
+    return function(event){
+      matrix.forEach(row=>row.forEach(col=>col.setSize(status.getSize("box"))))
+    }
+  }
+
   function _createNumber(self, count){
     const defaultNumber = self.getConfig("defaultNumber");
     
@@ -186,8 +172,10 @@ Board.prototype = (function(){
     }
   }
   
-  function _resetMatrix(self, cross, reverse){
-    const crossedMatrix = self.getData("matrix").cross(cross, reverse);
+
+  function _checkResetMatrix(self, matrix, cross, reverse){
+    const crossedMatrix = self.crossArray(matrix, cross, reverse);
+    const resetCols = []
     
     let checker = 0;
     let changer = 0;
@@ -205,7 +193,10 @@ Board.prototype = (function(){
         const baseNumber = baseCol.getData("number");
 
         if( baseNumber !== number ){
-          baseCol.setNumber(number);
+          resetCols.push({
+            inst: baseCol,
+            number: number
+          })
         } else {
           changer += 1;
         }
@@ -213,7 +204,82 @@ Board.prototype = (function(){
       });
     });
 
-    return checker !== changer;
+    return {
+      reset: checker !== changer,
+      cols: checker !== changer ? resetCols : null
+    }
+  }
+
+  function _gameOver(self){
+    Common.event.unbind(document, "keydown");
+    Common.event.unbind(self.el, "mousedown");
+    Common.event.unbind(self.el, "touchstart");
+    Common.event.unbind(document, "mouseup");
+    Common.event.unbind(document, "touchend");
+
+    const response = axios({
+      url: "/game/rank",
+      params: {
+        mode: self.getData("mode")
+      }
+    });
+    
+    response.then(function(result){
+      if( result.data.success ){
+        const list = result.data.payload.rank_list;
+
+        let html = '<ul>'
+        list.forEach(function(item){
+          html += '<li>'+item.name+"/"+item.score+'</li>'
+        });
+        html += "</li>";
+        
+        let modal = self.getInst("modal");
+        if( !modal ){
+          modal = new Modal({
+            title: "hi",
+            html: html,
+            buttons: [{
+              label: "취소",
+              id: "btn-cacnle",
+              classList: [ "btn-cancle" ],
+              onclick: function(event){
+                event.preventDefault();
+                modal.destroy();
+              },
+            }, {
+              label: "저장",
+              id: "btn-save",
+              classList: [ "btn-save" ],
+              onclick: function(event){
+                event.preventDefault();
+                modal.close();
+    
+                _init(self);
+              },
+            }]
+          });
+          self.setInst("modal", modal);
+        } else {
+          modal.setHTML(html);
+        }
+        modal.open();
+      }
+    }).catch(function(error){
+      console.error( error );
+    });
+
+  }
+
+  function _checkGameOver(self){
+    const matrix = self.getData("matrix");
+
+    const check_1 = _checkResetMatrix(self, matrix, cross, !reverse);
+    const check_2 = _checkResetMatrix(self, matrix, cross, !reverse);
+    const check_3 = _checkResetMatrix(self, matrix, !cross, reverse);
+    const check_4 = _checkResetMatrix(self, matrix, !cross, !reverse);
+
+    return !check_1.reset && !check_2.reset && !check_3.reset && !check_4.reset
   }
   
   function _move(self, vector){
@@ -231,12 +297,19 @@ Board.prototype = (function(){
       cross = false;
     }
     
-    const create = _resetMatrix(self, cross, reverse);
-    const scoreInst = self.getInst("status").getInst("score");
-    if( create ){
+    const matrix = self.getData("matrix");
+    const checked = _checkResetMatrix(self, matrix, cross, reverse);
+    if( checked.reset ){
+      checked.cols.forEach((reset)=>{reset.inst.setNumber(reset.number)});
+
       _createNumber(self, 1);
 
-      scoreInst.setMatrixScore(self.getData("matrix"))
+      self.getInst("status").getInst("score").setMatrixScore(matrix);
+    }
+
+    const gameOver = _checkGameOver(self);
+    if( gameOver ){
+      _gameOver(self);
     }
   }
 

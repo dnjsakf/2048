@@ -24,6 +24,6 @@ def createApp(env="dev"):
     return app
     
 def load_routes(app):
-  from routes import common
+  from routes import common, game
   
   return app

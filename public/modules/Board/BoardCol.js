@@ -3,7 +3,7 @@ const BoardCol = function(_config, _el){
   const config = Object.assign({}, _config);
   const datas = Object.assign({}, _config.datas);
   const insts = Object.assign({}, _config.insts);
-  const doms = {}
+  const doms = Object.assign({}, _config.doms);
   
   self.el = _el;
   self.el.instance = self;
@@ -54,17 +54,22 @@ BoardCol.prototype = (function(){
     const index = self.getConfig("index");
     const size = self.getConfig("size");
     
-    self.el.className = `col r${pIndex} c${index} empty`;
+    self.el.className = `board-col r${pIndex} c${index} empty`;
 
-    self.el.style.width = size+"px";
-    self.el.style.height = size+"px";
+    _setSize(self, size);
+  }
+
+  function _setSize(self, width, height){
+    height = height ? height : width;
+    
+    self.el.style.width = width+"px";
+    self.el.style.height = height+"px";
+    self.el.style.fontSize = ((width/35)).toFixed("1")+"em";
   }
   
   function _initEvent(self){
-    const col = self.el;
-
-    col.addEventListener("mousedown", self.handleMouseDown());
-    col.addEventListener("mouseup", self.handleMouseUp());
+    // Common.event.bind(self.el, "mousedown", self.handleMouseDown(), false);
+    // Common.event.bind(self.el, "mouseup", self.handleMouseUp(), false);
   }
 
   function _resetNumber(self){
@@ -94,10 +99,15 @@ BoardCol.prototype = (function(){
   return {
     init: function(){
       _init(this);
-    }, setNumber: function(number){
+    },
+    setNumber: function(number){
       _setNumber(this, number);
-    }, resetNumber: function(){
+    },
+    resetNumber: function(){
       _resetNumber(this);
+    },
+    setSize: function(width, height){
+      _setSize(this, width, height);
     }
   }
 })();

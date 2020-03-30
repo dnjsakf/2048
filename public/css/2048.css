@@ -12,20 +12,20 @@
 
 
 .board-wrapper { display: inline-block; width: 100%; height: 100%; }
-.board-wrapper .row .row-wrapper { display: inline-block; color: black; vertical-align: middle; }
-.board-wrapper .row .row-wrapper::after { content: ""; display: block; clear: both; }
+.board-wrapper .board-row .row-wrapper { display: inline-block; color: black; vertical-align: middle; }
+.board-wrapper .board-row .row-wrapper::after { content: ""; display: block; clear: both; }
 
-.board-wrapper .row .row-wrapper .col { display: table; margin: 3px; float: left; box-shadow: 0 0 5px 1px rgba(255, 71, 0, 50%) inset; text-align: center; vertical-align: baseline; }
-.board-wrapper .row .row-wrapper .col a { display: table-cell; vertical-align: middle; }
+.board-wrapper .board-row .row-wrapper .board-col { user-select: none; display: table; margin: 3px; float: left; box-shadow: 0 0 5px 1px rgba(255, 71, 0, 50%) inset; text-align: center; vertical-align: baseline; }
+.board-wrapper .board-row .row-wrapper .board-col a { display: table-cell; vertical-align: middle; }
 
 @media only screen and (min-width: 641px) {
   #root { width: 50%; height: 100%; }
 
-  .board-wrapper .row .row-wrapper .col { font-size: 2.2em; }
+  .board-wrapper .board-row .row-wrapper .board-col { font-size: 2.2em; }
 }
 
 @media only screen and (max-width: 640px) {
   #root { width: 100%; height: 100%; }
   
-  .board-wrapper .row .row-wrapper .col { font-size: 1.5em; }
+  .board-wrapper .board-row .row-wrapper .board-col { font-size: 1.5em; }
 }

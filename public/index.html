@@ -6,8 +6,10 @@
   <title>2048</title>
   <link href="{{ url_for('static', filename='css/common.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/animations.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/modal.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/2048.css') }}" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
   <div id="root">
@@ -17,6 +19,7 @@
     </div>
   </div>
   <script src="{{ url_for('static', filename='modules/Common/Common.js') }}"></script>
+  <script src="{{ url_for('static', filename='modules/Modal/Modal.js') }}"></script>
   <script src="{{ url_for('static', filename='modules/Handler/Handler.js') }}"></script>
 
   <script src="{{ url_for('static', filename='modules/Status/StatusScore.js') }}"></script>
