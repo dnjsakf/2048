@@ -18,7 +18,7 @@
 
 .modal.modal-body-wrapper { overflow: scroll; }
 .modal.modal-body-wrapper::-webkit-scrollbar { display: none; }
-.modal.modal-body:hover { z-index: 10023; background-color: white; padding: 10px 0; border-radius: 15px; animation: width_view 0.3s; box-shadow: 0 0 5px 1px darkgrey inset; }
+/* .modal.modal-body:hover { z-index: 10023; background-color: white; padding: 10px 0; border-radius: 15px; animation: width_view 0.3s; box-shadow: 0 0 5px 1px darkgrey inset; } */
 
 .list-header.item-row { border-bottom: 1px solid darkgray; font-weight: bold; }
 .list-data.item-row { border-bottom: 1px dotted darkgray; }

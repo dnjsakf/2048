@@ -31,7 +31,7 @@ StatusScore.prototype = (function(){
   }
   
   function _initData(self){
-    self.setData("score", 0);
+    self.setData("score", 4);
   }
   
   function _init(self){

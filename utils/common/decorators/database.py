@@ -111,6 +111,8 @@ class MongoDbDecorator(object):
         conn = Connector.connect("mongo")
 
         info = func(*args, **kwargs)
+        print( info )
+        print( type(info) )
         if schema is not None:
           info = schema().load(info)
 

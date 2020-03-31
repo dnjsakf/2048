@@ -8,6 +8,7 @@ from marshmallow import Schema, fields
 
 class GameRankingSchema(Schema):
   _id = fields.Str()
+  isMobile = fields.Boolean()
   name = fields.Str()
   mode = fields.Str()
   score = fields.Integer()
@@ -21,12 +22,13 @@ def insertRanking(info):
   return info
 
 @mongo.select("2048", "game_ranking", GameRankingSchema)
-def selectRanking(mode):
+def selectRanking(mode, isMobile=False):
   pipeline = []
 
   if mode is not None:
     pipeline.append({ "$match": {
-        "mode": mode
+        "mode": mode,
+        "isMobile": isMobile
       }
     })
   pipeline.extend([
@@ -55,6 +57,6 @@ def selectRanking(mode):
        "rank": { "$add": [ "$rank", 1 ] } 
       }
     },
-    { "$limit": 10 }
+    { "$limit": 30 }
   ])
   return pipeline

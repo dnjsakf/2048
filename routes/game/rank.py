@@ -4,14 +4,18 @@ from routes import app
 from utils.pipelines.game import rank
 
 from flask import request, jsonify
+from utils.common.logging import getLogger, DEBUG
+
+logger = getLogger(__name__, level=DEBUG)
 
 @app.route("/game/rank", methods=["GET"])
 def selectGameRanking():
   result = None
   try:
     mode = request.args.get("mode")
+    isMobile = request.args.get("isMobile")
 
-    rank_list = rank.selectRanking(mode)
+    rank_list = rank.selectRanking(mode, isMobile)
     result = {
     "success": True,
     "payload": {
@@ -31,7 +35,7 @@ def insertGameRanking():
   result = None
 
   try:
-    form = dict(request.form)
+    form = dict(request.json)
 
     rank.insertRanking( form )
 
@@ -43,5 +47,6 @@ def insertGameRanking():
       "success": False,
       "error": traceback.format_exc()
     }
+    logger.error( traceback.format_exc() )
     
   return result

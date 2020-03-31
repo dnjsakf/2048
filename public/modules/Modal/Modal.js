@@ -149,7 +149,7 @@ Modal.prototype = (function(){
     const buttons = document.createElement("div");
     buttons.className = "modal modal-buttons text-right";
     
-    options.forEach(btnOpt=>{
+    options.forEach(function(btnOpt){
       const buttonEl = document.createElement("button");
       const buttonLabel = document.createTextNode(btnOpt.label);
 
@@ -165,6 +165,11 @@ Modal.prototype = (function(){
 
       if( btnOpt.onclick && typeof(btnOpt.onclick) === "function" ){
         Common.event.bind(buttonEl, "click", btnOpt.onclick, false);
+      }
+      /** Set Visibility **/
+      const visible = typeof(btnOpt.visible) === 'undefined' || btnOpt.visible;
+      if( !visible ){
+        buttonEl.classList.add("invisible");
       }
 
       buttonEl.appendChild(buttonLabel);
@@ -227,6 +232,9 @@ Modal.prototype = (function(){
     },
     setContent: function(content){
       _setContent(this, content);
+    },
+    scrollTop: function(){
+      this.getDom("body").querySelector(".modal-body-wrapper").scrollTop = 0;
     }
   }
 })();

@@ -11,7 +11,7 @@ const RankingList = function(_config, _el){
   self.el.instance = self;
 
   self.setConfig = (k,v)=>{ config[k] = v; }
-  self.getConfig = (k)=>config[k];      
+  self.getConfig = (k)=>config[k];
   self.setData = (k,v)=>{ datas[k] = v; }
   self.getData = (k)=>datas[k];
   self.setInst = (k,v)=>{ insts[k] = v; }
@@ -64,16 +64,15 @@ RankingList.prototype = (function(){
     if( _validateConfig(self) ){
       _initData(self, function(error, data, response){
         if( !error ){
-          self.setData("list", data.rank_list);
+          _checkRankList(self, data.rank_list);
           
           _initRender(self);
           _initEvent(self);
-          
-          _checkRank(self, {
-            score: 10000,
-            name: "heo",
-            mode: "4x4"
-          });
+
+          const newRankInput = self.getDom("newRankInput");
+          if( newRankInput ){
+            newRankInput.focus();
+          }
         }
       });
     }
@@ -131,14 +130,13 @@ RankingList.prototype = (function(){
       col.appendChild(textEl);
       
       /** Set Visibility **/
-      const visible = column.visible || true;
+      const visible = typeof(column.visible) === 'undefined' || column.visible;
       if( !visible ){
         col.classList.add("invisible");
       }
-      
+
       row.appendChild(col);
     });
-    
     header.appendChild(row);
     
     return header;
@@ -166,12 +164,25 @@ RankingList.prototype = (function(){
           col.classList.add(align);
         }
         
-        /** Set Text **/  
-        const text = data[column.name] || column.defaultText || ""
-        const textEl = document.createElement("a");
-        const textNode = document.createTextNode(text);
-        textEl.appendChild(textNode);
-        col.appendChild(textEl);
+        if( column.name === "name" && data.newRank ){
+          const input = document.createElement("input");
+          input.type = "text";
+          input.className = "text-center";
+          input.maxLength = 10;
+          
+          col.appendChild(input);
+
+          self.setDom("newRankInput", input);
+
+          Common.event.bind(input, "keydown", self.getConfig("events").onKeyDown(data), false);
+        } else {
+          /** Set Text **/  
+          const text = data[column.name] || column.defaultText || ""
+          const textEl = document.createElement("a");
+          const textNode = document.createTextNode(text);
+          textEl.appendChild(textNode);
+          col.appendChild(textEl);
+        }
       
         /** Set Visibility **/
         const visible = column.visible || true;
@@ -190,40 +201,55 @@ RankingList.prototype = (function(){
     return listItems;
   }
   
-  function _checkRank(self, checkData){
-    let inputRankList = [];
-    const listData = self.getData("list");
-    
-    const grateRank = listData.filter(function(data){
-      return checkData.score <= data.score;
-    });
-    inputRankList = inputRankList.concat( grateRank );
-    
-    const ranker = grateRank.length !== listData.length;
-    if( ranker ){
-      const newRankData = Object.assign({newRank: true, rank: grateRank.length+1}, checkData);
-      const lessRank = listData.filter(function(data){
-        return [
-          checkData.score > data.score,
-          checkData.mode === data.mode
-        ].reduce((prev, crnt)=>( prev && crnt ));
-      }).map(function(data){
-        return Object.assign(data, { rank: data.rank+1 } )
+  function _checkRankList(self, listData){
+    let rankList = listData;
+    const rankData = self.getData("rankData");
+
+    if( rankData ){
+      const grateRank = listData.filter(function(data){
+        return rankData.score <= data.score;
       });
-      inputRankList.push( newRankData );
-      inputRankList = inputRankList.concat( lessRank );
-      
-      self.setData("newRankData", newRankData);
+      rankList = [].concat( grateRank );
+  
+      const ranker = grateRank.length !== listData.length;
+      // if( listData.length === 0 || ranker ){
+        const newRankData = Object.assign({newRank: true, rank: grateRank.length+1}, rankData);
+        const lessRank = listData.filter(function(data){
+          return [
+            rankData.score > data.score,
+            rankData.mode === data.mode
+          ].reduce((prev, crnt)=>( prev && crnt ));
+        }).map(function(data){
+          return Object.assign(data, { rank: data.rank+1 } )
+        });
+        rankList.push( newRankData );
+        rankList = rankList.concat( lessRank );
+        
+        self.setData("newRankData", newRankData);
+      // }
     }
-    self.setData("inputRankList", inputRankList);
+    self.setData("list", rankList);
   }
   
   return {
     init: function(){
       _init(this);
-    }, 
+    },
+    reload: function(){
+      this.setData("list", null);
+      this.setData("rankData", null);
+
+      _init(this);
+    },
     checkRank: function(data){
       _checkRank(this, data);
+    },
+    getNewRankData: function(){
+      const newRankData = this.getData("newRankData");
+      const newRankInput = this.getDom("newRankInput");
+      const newRankName = newRankInput.value;
+      
+      return Object.assign(newRankData, {name: newRankName});
     }
   }
 })();

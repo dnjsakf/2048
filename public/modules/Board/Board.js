@@ -45,8 +45,6 @@ Board.prototype = (function(){
       
       const status =  self.getInst("status");
       status.getInst("score").init()
-      
-      _gameOver(self);
     }
   }
   
@@ -231,11 +229,19 @@ Board.prototype = (function(){
 
   function _gameOver(self){
     _unbindEvent(self);
-    
-    const inst =  document.createElement("div").RankingList({
+
+    const status = self.getInst("status");
+    const mode = status.getInst("mode");
+    const score = status.getInst("score");
+
+    const modeLabel = mode.getData("mode").label;
+    const isMobile = self.isMobile();
+
+    const rankingList =  document.createElement("div").RankingList({
       url: "/game/rank",
       params: {
-        mode: self.getData("mode")
+        mode: modeLabel,
+        isMobile: isMobile
       },
       header: true,
       columns: [
@@ -243,39 +249,94 @@ Board.prototype = (function(){
         { label: "Name", name: "name", width: "4", align: "center" },
         { label: "Score", name: "score", width: "3", align: "right" },
         { label: "Date", name: "reg_dttm", width: "3", align: "center" },
-      ]
+      ],
+      datas: {
+        rankData: {
+          score: score.getData("score"),
+          mode: modeLabel
+        }
+      },
+      events: {
+        onKeyDown: function(data){
+          return function(event){
+            if( event.keyCode == 13 ){
+              const newRankData = Object.assign(data, {name: event.target.value});
+
+              _saveRank(self, newRankData);
+
+              Common.event.unbind(event.target, "keydown");
+            } else if ( event.keyCode === 27 ){
+              _init(self);
+              self.getInst("modal").close(true);
+            }
+          }
+        }
+      }
     });
+    self.setInst("rankingList", rankingList);
     
+    const title = ( isMobile ? "Mobile": "PC" )+" "+modeLabel+" Ranking";
     let modal = self.getInst("modal");
     if( !modal || !modal.el ){
       modal = new Modal({
-        title: "Ranking",
-        content: inst.el,
+        title: title,
+        content: rankingList.el,
         buttons: [{
           label: "취소",
           id: "btn-cacnle",
           classList: [ "btn-cancle" ],
           onclick: function(event){
             event.preventDefault();
-            modal.close();
+
+            _init(self);
+
+            modal.close(true);
           },
         }, {
+          visible: false,
           label: "저장",
           id: "btn-save",
           classList: [ "btn-save" ],
           onclick: function(event){
             event.preventDefault();
-            modal.close(true);
+
+            _saveRank(self, inst.getNewRankData());
 
             _init(self);
+
+            modal.close(true);
           },
         }]
       });
       self.setInst("modal", modal);
     } else {
-      modal.setContent(inst.el);
+      modal.setContent(rankingList.el);
     }
     modal.open();
+  }
+
+  function _saveRank(self, data){
+    const response = axios({
+      method: "POST",
+      url: "/game/rank",
+      baseurl: "http://localhost:3000",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      data: {
+        score: data.score,
+        name: data.name,
+        mode: data.mode,
+        isMobile: isMobile
+      }
+    }).then(function(result){
+      console.log(result);
+      
+      self.getInst("modal").scrollTop();
+      self.getInst("rankingList").reload();
+    }).catch(function(error){
+      console.log(error);
+    });
   }
 
   function _checkGameOver(self){

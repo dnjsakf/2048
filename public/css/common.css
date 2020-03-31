@@ -39,6 +39,8 @@ ul { list-style: none; }
 .list-data { border-bottom: 1px dotted darkgray; }
 .list-data:hover { background-color: rgba(200,200,200, 0.1); }
 
+.invisible { display: none; }
+
 
 /* Chrome, Safari용 스크롤 바 */
 /*
