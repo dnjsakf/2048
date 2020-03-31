@@ -1,5 +1,5 @@
 const status = document.getElementById("status").Status({
-  mode: "3x3",
+  mode: "2x2",
   doms: {
     screen: document.querySelector("#root > .root-wrapper")
   }

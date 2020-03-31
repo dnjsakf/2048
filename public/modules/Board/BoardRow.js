@@ -22,8 +22,9 @@ BoardRow.prototype = (function(){
   function _validateConfig(self){
     const valid = true;
     
-    if( !self.getConfig("index") ){
-      console.error("Invalid index option.", self.getConfig("index"));
+    const index = self.getConfig("index");
+    if( !index ){
+      console.error("Invalid Configuration. index="+index);
       return false;
     }
     

@@ -33,6 +33,12 @@ StatusMode.prototype = (function(){
   function _initData(self){
     const defaultMode = self.getConfig("defaultMode");
     const modeOptions = [{
+      label: "2x2",
+      data: 2,
+      style: {
+        margin: 5+3
+      }
+    }, {
       label: "3x3",
       data: 3,
       style: {

@@ -16,6 +16,9 @@ def getLogger(name, level=LOGGING_LEVEL, file=LOGGING_FILE):
   logger.addHandler( stream_hander )
 
   if file == True:
+    if os.path.exists( LOGGING_PATH ) == False:
+      os.mkdir( LOGGING_PATH )
+  
     filename = os.path.join( LOGGING_PATH, "log_{}.log".format( current_date ) )
     file_handler = logging.FileHandler( filename )
     file_handler.setFormatter( formatter )

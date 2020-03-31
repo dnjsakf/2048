@@ -1,4 +1,5 @@
-// import Handler from './modules/Handler/Handler.js'
+//import Handler from '/public/modules/Handler/Handler.js'
+//import Common from '/public/modules/Common/Common.js'
 
 const Board = function(_config, _el){
   const self = this;
@@ -30,6 +31,7 @@ Board.prototype = (function(){
   }
   
   function _initData(self){
+    
   }
   
   function _init(self){
@@ -40,16 +42,19 @@ Board.prototype = (function(){
 
       const defaultCount = self.getConfig("defaultCount"); 
       _createNumber(self, defaultCount);
+      
+      const status =  self.getInst("status");
+      status.getInst("score").init()
+      
+      _gameOver(self);
     }
   }
   
   function _initRender(self){
+    self.el.innerHTML = "";
+    
     const wrapper = document.createElement("div");
     wrapper.className = "board-wrapper";
-    
-    if( self.el.children ){
-      Array.from(self.el.children).forEach(children=>children.remove());
-    }
   
     const size = self.getInst("status").getSize();
     const matrix = [];
@@ -89,6 +94,8 @@ Board.prototype = (function(){
   }
 
   function _initEvent(self){
+    _unbindEvent(self);
+    
     const onHandleKeyDown = self.handleKeyDown();
     Common.event.bind(document, "keydown", onHandleKeyDown, false);
     
@@ -117,6 +124,16 @@ Board.prototype = (function(){
       Common.event.bind(window, "resize", _handleResize(self), false);
     }
   }
+  
+  function _unbindEvent(self){
+    Common.event.unbind(document, "keydown");
+    Common.event.unbind(self.el, "mousedown");
+    Common.event.unbind(self.el, "touchstart");
+    Common.event.unbind(document, "mouseup");
+    Common.event.unbind(document, "touchend");
+    Common.event.unbind(window, "resize");
+    Common.event.unbind(self.getInst("status").getInst("mode").el, "change");
+  }
 
   function _handleResize(self){
     const status = self.getInst("status");
@@ -130,17 +147,19 @@ Board.prototype = (function(){
   function _createNumber(self, count){
     const defaultNumber = self.getConfig("defaultNumber");
     
-    const emptyCols = self.getData("matrix").reduce((prev, crnt, idx)=>{
-      if( idx === 1 ){
-        prev = prev.filter(col=>!col.getData("number"));
-      }
-      return prev.concat(crnt.filter(col=>!col.getData("number")));
-    });
-    
-    if( emptyCols.length > 0 ){
-      for(let i=0; i<count; i++){
+    for(let i=0; i<count; i++){
+      const emptyCols = self.getData("matrix").reduce((prev, crnt, idx)=>{
+        if( idx === 1 ){
+          prev = prev.filter(col=>!col.getData("number"));
+        }
+        return prev.concat(crnt.filter(col=>!col.getData("number")));
+      });
+      
+      if( emptyCols.length > 0 ){
         const randCol = emptyCols[parseInt(Math.random()*emptyCols.length)];
         randCol.setNumber(defaultNumber);
+      } else {
+        break;
       }
     }
   }
@@ -211,64 +230,52 @@ Board.prototype = (function(){
   }
 
   function _gameOver(self){
-    Common.event.unbind(document, "keydown");
-    Common.event.unbind(self.el, "mousedown");
-    Common.event.unbind(self.el, "touchstart");
-    Common.event.unbind(document, "mouseup");
-    Common.event.unbind(document, "touchend");
-
-    const response = axios({
+    _unbindEvent(self);
+    
+    const inst =  document.createElement("div").RankingList({
       url: "/game/rank",
       params: {
         mode: self.getData("mode")
-      }
+      },
+      header: true,
+      columns: [
+        { label: "Rank", name: "rank", width: "2", align: "center" },
+        { label: "Name", name: "name", width: "4", align: "center" },
+        { label: "Score", name: "score", width: "3", align: "right" },
+        { label: "Date", name: "reg_dttm", width: "3", align: "center" },
+      ]
     });
     
-    response.then(function(result){
-      if( result.data.success ){
-        const list = result.data.payload.rank_list;
+    let modal = self.getInst("modal");
+    if( !modal || !modal.el ){
+      modal = new Modal({
+        title: "Ranking",
+        content: inst.el,
+        buttons: [{
+          label: "취소",
+          id: "btn-cacnle",
+          classList: [ "btn-cancle" ],
+          onclick: function(event){
+            event.preventDefault();
+            modal.close();
+          },
+        }, {
+          label: "저장",
+          id: "btn-save",
+          classList: [ "btn-save" ],
+          onclick: function(event){
+            event.preventDefault();
+            modal.close(true);
 
-        let html = '<ul>'
-        list.forEach(function(item){
-          html += '<li>'+item.name+"/"+item.score+'</li>'
-        });
-        html += "</li>";
-        
-        let modal = self.getInst("modal");
-        if( !modal ){
-          modal = new Modal({
-            title: "hi",
-            html: html,
-            buttons: [{
-              label: "취소",
-              id: "btn-cacnle",
-              classList: [ "btn-cancle" ],
-              onclick: function(event){
-                event.preventDefault();
-                modal.destroy();
-              },
-            }, {
-              label: "저장",
-              id: "btn-save",
-              classList: [ "btn-save" ],
-              onclick: function(event){
-                event.preventDefault();
-                modal.close();
-    
-                _init(self);
-              },
-            }]
-          });
-          self.setInst("modal", modal);
-        } else {
-          modal.setHTML(html);
-        }
-        modal.open();
-      }
-    }).catch(function(error){
-      console.error( error );
-    });
-
+            _init(self);
+          },
+        }]
+      });
+      self.setInst("modal", modal);
+    } else {
+      modal.setContent(inst.el);
+    }
+    modal.open();
   }
 
   function _checkGameOver(self){

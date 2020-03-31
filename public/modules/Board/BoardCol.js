@@ -24,13 +24,15 @@ BoardCol.prototype = (function(){
   function _validateConfig(self){
     const valid = true;
     
-    if( !self.getConfig("index") ){
-      console.error("Invalid index option.", self.getConfig("index"));
+    const index = self.getConfig("index");
+    if( !index ){
+      console.error("Invalid Configuration. index="+index);
       return false;
     }
     
-    if( !self.getConfig("size") ){
-      console.error("Invalid size option.", self.getConfig("size"));
+    const size = self.getConfig("size");
+    if( !size ){
+      console.error("Invalid Configuration. size="+size);
       return false;
     }
     

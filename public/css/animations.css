@@ -33,3 +33,7 @@
   /* 50% { transform: scale3d(1.2, 1.2, 1.2); } */
   100% { transform: scale3d(1, 1, 1); }
 }
+@keyframes width_view {
+  0% { padding-top: 50px; padding-bottom: 50px; }
+  100% { padding-top: 10px; padding-bottom: 10px; }
+}

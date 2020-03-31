@@ -25,9 +25,9 @@ Modal.prototype = (function(){
   function _validateConfig(self){
     const valid = true;
 
-    const html = self.getConfig("html");
-    if( !html ){
-      console.error("Not found configuration, html. "+html);
+    const content = self.getConfig("content");
+    if( !content ){
+      console.error("Invalid Configuration. content="+content);
     };
     
     return valid;
@@ -69,9 +69,9 @@ Modal.prototype = (function(){
       wrapper.appendChild(modalHeader);
     }
 
-    const html = self.getConfig("html");
-    if( html ){
-      modalBody = _renderBody(self, html);
+    const content = self.getConfig("content");
+    if( content ){
+      modalBody = _renderBody(self, content);
       wrapper.appendChild(modalBody);
     }
 
@@ -107,33 +107,47 @@ Modal.prototype = (function(){
 
   function _renderHeader(self, title){
     const header = document.createElement("div");
+    const wrapper = document.createElement("div");
     const titleEl = document.createElement("a");
     const titleText = document.createTextNode(title);
     
-    titleEl.appendChild(titleText);
-    header.appendChild(titleEl);
-
+    wrapper.className = "modal modal-header-wrapper";
     header.className = "modal modal-header";
+    
+    titleEl.appendChild(titleText);    
+    wrapper.appendChild(titleEl);
+    header.appendChild(wrapper);
 
     return header;
   }
 
-  function _renderBody(self, html){
+  function _renderBody(self, content){
     const body = document.createElement("div");
+    const wrapper = document.createElement("div");
 
     body.className = "modal modal-body";
-    body.innerHTML = html;
+    wrapper.className = "modal modal-body-wrapper";
+    
+    if( content instanceof Element ){
+      wrapper.appendChild( content );
+    } else {
+      wrapper.innerHTML = content;
+    }      
+    
+    body.appendChild(wrapper);
 
     return body;
   }
 
   function _renderFooter(self, options){
     const footer = document.createElement("div");
+    const wrapper = document.createElement("div");
 
     footer.className = "modal modal-footer";
+    wrapper.className = "modal modal-footer-wrapper";
 
     const buttons = document.createElement("div");
-    buttons.className = "modal modal-buttons";
+    buttons.className = "modal modal-buttons text-right";
     
     options.forEach(btnOpt=>{
       const buttonEl = document.createElement("button");
@@ -157,7 +171,8 @@ Modal.prototype = (function(){
       buttons.appendChild(buttonEl);
     });
 
-    footer.appendChild(buttons);
+    wrapper.appendChild(buttons);
+    footer.appendChild(wrapper);
 
     return footer;
   }
@@ -168,6 +183,16 @@ Modal.prototype = (function(){
       
     }
   }
+  
+  function _setContent(self, content){
+    const body = self.getDom("body");
+    if( content instanceof Element ){
+      body.innerHTML = "";
+      body.appendChild( content );
+    } else {
+      body.querySelector(".modal-body-wrapper").innerHTML = content;
+    }      
+  }
 
   function _open(self){
     self.getDom("container").classList.add("open");
@@ -175,10 +200,12 @@ Modal.prototype = (function(){
 
   function _close(self){
     self.getDom("container").classList.remove("open");
+    self.el = null;
   }
   
   function _destroy(self){
     self.getDom("container").remove();
+    self.el = null;
   }
   
   return {
@@ -198,8 +225,8 @@ Modal.prototype = (function(){
     destroy: function(){
       _destroy(this);
     },
-    setHTML: function(html){
-      this.getDom("body").innerHTML = html;
+    setContent: function(content){
+      _setContent(this, content);
     }
   }
 })();

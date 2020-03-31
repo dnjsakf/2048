@@ -1,6 +1,4 @@
 #root { margin: 0 auto; padding: 10px 10px; }
-#status { z-index: 200; position: absolute; height: 50px; }
-#board { z-index: 100; position: relative; padding-top: 50px; width: 100%; height: 100%; text-align: center; }
 
 .root-wrapper { width: 100%; height: 100%; }
 
@@ -18,14 +16,19 @@
 .board-wrapper .board-row .row-wrapper .board-col { user-select: none; display: table; margin: 3px; float: left; box-shadow: 0 0 5px 1px rgba(255, 71, 0, 50%) inset; text-align: center; vertical-align: baseline; }
 .board-wrapper .board-row .row-wrapper .board-col a { display: table-cell; vertical-align: middle; }
 
+
 @media only screen and (min-width: 641px) {
   #root { width: 50%; height: 100%; }
+  #status { z-index: 200; position: absolute; }
+  #board { z-index: 100; position: relative; width: 100%; height: 100%; text-align: center; }
 
   .board-wrapper .board-row .row-wrapper .board-col { font-size: 2.2em; }
 }
 
 @media only screen and (max-width: 640px) {
   #root { width: 100%; height: 100%; }
+  #status { z-index: 200; position: absolute; height: 50px; }
+  #board { z-index: 100; position: relative; padding-top: 50px; width: 100%; height: 100%; text-align: center; }
   
   .board-wrapper .board-row .row-wrapper .board-col { font-size: 1.5em; }
 }

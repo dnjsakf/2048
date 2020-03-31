@@ -105,7 +105,7 @@ Common.bindElement = function(func, initConfig){
 }
 
 Common.event = (function(){
-  bindings = [];
+  let bindings = [];
 
   function _bind(el, action, event, args){
     const binded = bindings.filter(function(binding){

@@ -1,6 +1,7 @@
 * { padding: 0; margin: 0; box-sizing: border-box; }
 
 html, body { width: 100%; height: 100%; }
+ul { list-style: none; }
 
 .s50 { width: 50px; height: 50px; }
 .s75 { width: 75px; height: 75px; }
@@ -13,6 +14,39 @@ html, body { width: 100%; height: 100%; }
 .s75 { width: 75px; height: 75px; }
 
 .m5 { margin-left: 2px; margin-top: 2px; }
+
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+.item-row { display: table; width: 100%; height: 100%; }
+
+.item-col { display: table-cell; padding: 5px 10px; word-break: break-all; vertical-align: middle; }
+.item-col.c1 { width: 8.3%; }
+.item-col.c2 { width: 16.6%; }
+.item-col.c3 { width: 25%; }
+.item-col.c4 { width: 33.3%; }
+.item-col.c5 { width: 41.6%; }
+.item-col.c6 { width: 50%; }
+.item-col.c7 { width: 58.3%; }
+.item-col.c8 { width: 66.3%; }
+.item-col.c9 { width: 75%; }
+.item-col.c10 { width: 83.3%; }
+.item-col.c11 { width: 91.6%; }
+.item-col.c12 { width: 100%; }
+
+.list-header { border-bottom: 1px solid darkgray; font-weight: bold; }
+.list-data { border-bottom: 1px dotted darkgray; }
+.list-data:hover { background-color: rgba(200,200,200, 0.1); }
+
+
+/* Chrome, Safari용 스크롤 바 */
+/*
+::-webkit-scrollbar { width: 8px; height: 8px; border: 3px solid #fff; }
+::-webkit-scrollbar-button:start:decrement, ::-webkit-scrollbar-button:end:increment {display: block; height: 10px; }
+::-webkit-scrollbar-track { background: #efefef; -webkit-border-radius: 10px; border-radius:10px; -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.2)}
+::-webkit-scrollbar-thumb { height: 50px; width: 50px; background: rgba(0,0,0,.2); -webkit-border-radius: 8px; border-radius: 8px; -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.1)}
+*/
 
 
 .dropdown {

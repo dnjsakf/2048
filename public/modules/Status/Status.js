@@ -75,7 +75,7 @@ Status.prototype = (function(){
     const screen = self.getDom("screen");
     const boardSize = {
       width: screen.offsetWidth,
-      height: screen.offsetHeight - self.el.offsetHeight
+      height: screen.offsetHeight - ( self.isMobile() ? self.el.offsetHeight : 0 )
     }
     return boardSize;
   }
