@@ -68,6 +68,12 @@ RankingList.prototype = (function(){
           
           _initRender(self);
           _initEvent(self);
+          
+          _checkRank(self, {
+            score: 10000,
+            name: "heo",
+            mode: "4x4"
+          });
         }
       });
     }
@@ -184,9 +190,40 @@ RankingList.prototype = (function(){
     return listItems;
   }
   
+  function _checkRank(self, checkData){
+    let inputRankList = [];
+    const listData = self.getData("list");
+    
+    const grateRank = listData.filter(function(data){
+      return checkData.score <= data.score;
+    });
+    inputRankList = inputRankList.concat( grateRank );
+    
+    const ranker = grateRank.length !== listData.length;
+    if( ranker ){
+      const newRankData = Object.assign({newRank: true, rank: grateRank.length+1}, checkData);
+      const lessRank = listData.filter(function(data){
+        return [
+          checkData.score > data.score,
+          checkData.mode === data.mode
+        ].reduce((prev, crnt)=>( prev && crnt ));
+      }).map(function(data){
+        return Object.assign(data, { rank: data.rank+1 } )
+      });
+      inputRankList.push( newRankData );
+      inputRankList = inputRankList.concat( lessRank );
+      
+      self.setData("newRankData", newRankData);
+    }
+    self.setData("inputRankList", inputRankList);
+  }
+  
   return {
     init: function(){
       _init(this);
+    }, 
+    checkRank: function(data){
+      _checkRank(this, data);
     }
   }
 })();
