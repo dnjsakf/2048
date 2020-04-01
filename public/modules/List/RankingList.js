@@ -50,6 +50,7 @@ RankingList.prototype = (function(){
       }
     }).then(function(result){
       if( result.data.success ){
+        console.log( result.data );
         callback(null, result.data.payload, result);
       } else {
         callback(result.data.error, null, result);

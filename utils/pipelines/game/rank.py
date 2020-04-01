@@ -1,34 +1,14 @@
-import datetime
-
-from pymongo import UpdateOne
+from utils.common.schemas import RankingSchema, RankingItemSchema
 from utils.common.decorators.database import MongoDbDecorator as mongo
-from utils.pipelines import common
 
-from marshmallow import Schema, fields
-
-class GameRankingSchema(Schema):
-  _id = fields.Str()
-  isMobile = fields.Boolean()
-  name = fields.Str()
-  mode = fields.Str()
-  score = fields.Integer()
-  runtime = fields.Integer()
-  rank = fields.Integer()
-  reg_dttm = fields.Str()
-
-@mongo.insert_one("2048", "game_ranking", GameRankingSchema)
-def insertRanking(info):
-  info["reg_dttm"] = default=datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-  return info
-
-@mongo.select("2048", "game_ranking", GameRankingSchema)
-def selectRanking(mode, isMobile=False):
+@mongo.select("2048", "game_ranking", RankingItemSchema)
+def selectRanking(schema: RankingSchema):
   pipeline = []
 
-  if mode is not None:
+  if schema is not None:
     pipeline.append({ "$match": {
-        "mode": mode,
-        "isMobile": isMobile
+        "mode": schema.get("mode"),
+        "isMobile": schema.get("isMobile")
       }
     })
   pipeline.extend([
@@ -59,4 +39,10 @@ def selectRanking(mode, isMobile=False):
     },
     { "$limit": 30 }
   ])
+  
   return pipeline
+
+
+@mongo.insert_one("2048", "game_ranking")
+def insertRanking(schema: RankingItemSchema):
+  return schema

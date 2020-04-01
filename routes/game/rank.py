@@ -5,23 +5,23 @@ from utils.pipelines.game import rank
 
 from flask import request, jsonify
 from utils.common.logging import getLogger, DEBUG
+from utils.common.schemas import RankingSchema, RankingItemSchema
+from utils.common.decorators.schemas import ParamsDecorator as params
 
 logger = getLogger(__name__, level=DEBUG)
 
 @app.route("/game/rank", methods=["GET"])
-def selectGameRanking():
+@params.args(RankingSchema)
+def selectGameRanking(schema):
   result = None
   try:
-    mode = request.args.get("mode")
-    isMobile = request.args.get("isMobile")
-
-    rank_list = rank.selectRanking(mode, isMobile)
+    rank_list = rank.selectRanking(schema)
     result = {
     "success": True,
     "payload": {
       "rank_list": rank_list
+      }
     }
-  }
   except Exception as e:
     result = {
       "success": False,
@@ -31,13 +31,12 @@ def selectGameRanking():
   return result
 
 @app.route("/game/rank", methods=["POST"])
-def insertGameRanking():
+@params.json(RankingItemSchema)
+def insertGameRanking(schema):
   result = None
 
   try:
-    form = dict(request.json)
-
-    rank.insertRanking( form )
+    rank.insertRanking(schema)
 
     result = {
       "success": True

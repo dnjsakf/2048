@@ -1,3 +1,5 @@
+import traceback
+
 from functools import wraps
 
 from pymongo.cursor import Cursor
@@ -87,34 +89,35 @@ class MongoDbDecorator(object):
 
         pipeline = func(*args, **kwargs)
 
-        items = conn[database][document].aggregate(pipeline)
+        items = None
+        try:
+          items = conn[database][document].aggregate(pipeline)
 
-        if( isinstance(items, CommandCursor) or isinstance(items, Cursor)):
-          items = list(items)
-        else:
-          items = [items]
+          if( isinstance(items, CommandCursor) or isinstance(items, Cursor)):
+            items = list(items)
+          else:
+            items = [items]
 
-        if len(items) and schema is not None:
-          items = schema(many=True).load(items)
+          if len(items) and schema is not None:
+            items = schema().dump(items, many=True)
 
-        logger.info("count: {}".format(len(items)))
-        
+          logger.info("count: {}".format(len(items)))
+        except:
+          items = None
+          logger.error( traceback.format_exc() )
+          
         return items
       return wrapper
     return decorator
 
   @classmethod
-  def insert_one(cls, database=None, document=None, schema=None):
+  def insert_one(cls, database=None, document=None):
     def decorator(func):
       @wraps(func)
       def wrapper(*args, **kwargs):
         conn = Connector.connect("mongo")
 
         info = func(*args, **kwargs)
-        print( info )
-        print( type(info) )
-        if schema is not None:
-          info = schema().load(info)
 
         obj_id = conn[database][document].insert(info)
         if( obj_id ):

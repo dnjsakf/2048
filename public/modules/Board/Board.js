@@ -237,12 +237,14 @@ Board.prototype = (function(){
     const modeLabel = mode.getData("mode").label;
     const isMobile = self.isMobile();
 
+    const params = {
+      mode: modeLabel,
+      isMobile: isMobile
+    }
+
     const rankingList =  document.createElement("div").RankingList({
       url: "/game/rank",
-      params: {
-        mode: modeLabel,
-        isMobile: isMobile
-      },
+      params: params,
       header: true,
       columns: [
         { label: "Rank", name: "rank", width: "2", align: "center" },
@@ -316,6 +318,13 @@ Board.prototype = (function(){
   }
 
   function _saveRank(self, data){
+    const requestData =  {
+      score: data.score,
+      name: data.name,
+      mode: data.mode,
+      isMobile: self.isMobile()
+    }
+
     const response = axios({
       method: "POST",
       url: "/game/rank",
@@ -323,19 +332,16 @@ Board.prototype = (function(){
       headers: {
         "Content-Type": "application/json"
       },
-      data: {
-        score: data.score,
-        name: data.name,
-        mode: data.mode,
-        isMobile: isMobile
-      }
+      data: requestData
     }).then(function(result){
       console.log(result);
       
       self.getInst("modal").scrollTop();
       self.getInst("rankingList").reload();
+    }, function(_error){
+      console.error("error", _error.message);
     }).catch(function(error){
-      console.log(error);
+      console.error(error);
     });
   }
 
