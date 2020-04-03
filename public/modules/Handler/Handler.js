@@ -64,8 +64,6 @@ Handler.prototype = (function(){
   
   function _handleMouseUp(self, setting){
     return function(event){
-      event.preventDefault();
-
       if( self.move ){
         const lock = self.getData("lock");
         const focusPos = self.getData("focusPos");
