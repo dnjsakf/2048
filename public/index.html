@@ -12,25 +12,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <div id="root">
-    <div class="root-wrapper">
-      <div id="status"></div>
-      <div id="board"></div>
-    </div>
-  </div>
-  <script src="{{ url_for('static', filename='modules/Common/Common.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/Modal/Modal.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/Handler/Handler.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/List/RankingList.js') }}"></script>  
-
-  <script src="{{ url_for('static', filename='modules/Status/StatusScore.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/Status/StatusMode.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/Status/Status.js') }}"></script>
-  
-  <script src="{{ url_for('static', filename='modules/Board/BoardCol.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/Board/BoardRow.js') }}"></script>
-  <script src="{{ url_for('static', filename='modules/Board/Board.js') }}"></script>
-  
-  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+  <div id="root"></div>
+  <script type="module" src="{{ url_for('static', filename='modules/App.js') }}"></script>
 </body>
 </html>

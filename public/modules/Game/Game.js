@@ -1,6 +1,13 @@
-import Common from '/public/modules/Common/Common.js';
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+import Board from '/public/modules/Game/Board/Board.js';
+import Status from '/public/modules/Game/Status/Status.js';
 
-const Templates = function(_config, _el){
+
+const initConfig = {
+  parent: null
+}
+
+const Game = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
   const datas = Object.assign({}, _config.datas);
@@ -18,11 +25,9 @@ const Templates = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common]);
 }
 
-Templates.prototype = (function(){
+Game.prototype = (function(){
   function _validateConfig(self){
     const valid = true;
     
@@ -30,25 +35,43 @@ Templates.prototype = (function(){
   }
   
   function _initData(self){
-
+    
   }
   
   function _init(self){
     if( _validateConfig(self) ){
       _initData(self);
       _initRender(self);
-      _initEvent(self);
     }
   }
-  
+
   function _initRender(self){
+    const wrapper = document.createElement("div");
+    wrapper.className = "root-wrapper";
+    wrapper.innerHTML = `
+    <div id="status"></div>
+    <div id="board"></div>
+    `;
+    self.el.appendChild(wrapper);
+
+    const status = self.el.querySelector("#status").Status({
+      parent: self,
+      mode: "4x4",
+      doms: {
+        screen: wrapper
+      }
+    });
+    self.setInst("status", status);
     
+    const board = self.el.querySelector("#board").Board({
+      parent: self,
+      insts: {
+        status: status
+      }
+    });
+    self.setInst("board", board);
   }
 
-  function _initEvent(self){
-   
-  }
-  
   return {
     init: function(){
       _init(this);
@@ -56,8 +79,4 @@ Templates.prototype = (function(){
   }
 })();
 
-const initConfig = {
-  parent: null
-};
-
-export default Common.bindElement(Templates, initConfig);
+export default bindElement(Game, initConfig);

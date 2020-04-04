@@ -1,4 +1,4 @@
-#root { margin: 0 auto; padding: 10px 10px; }
+#root { margin: 0 auto; padding: 10px 10px;  }
 
 .root-wrapper { width: 100%; height: 100%; }
 
@@ -26,7 +26,7 @@
 }
 
 @media only screen and (max-width: 640px) {
-  #root { width: 100%; height: 100%; }
+  #root { width: 100%; height: 100%; position: fixed; }
   #status { z-index: 200; position: absolute; height: 50px; }
   #board { z-index: 100; position: relative; padding-top: 50px; width: 100%; height: 100%; text-align: center; }
   

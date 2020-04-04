@@ -1,21 +1,18 @@
-const Handler = function(config){
+const Handler = function(_parent, _config){
   const self = this;
-  const datas = {}
-  const insts = {}
-  const doms = {}
+  const config = _config||{};
+  const datas = {};
+
+  self.parent = _parent;
   
   self.setConfig = (k,v)=>{ config[k] = v; }
-  self.getConfig = (k)=>config[k];
+  self.getConfig = (k)=>config[k];      
   self.setData = (k,v)=>{ datas[k] = v; }
   self.getData = (k)=>datas[k];
-  self.setInst = (k,v)=>{ insts[k] = v; }
-  self.getInst = (k)=>insts[k];
-  self.setDom = (k,v)=>{ doms[k] = v; }
-  self.getDom = (k)=>doms[k];
 }
 
 Handler.prototype = (function(){
-  function _handleKeyDown(self, board){
+  function _handleKeyDown(self){
     return function(event){
       let vector = null;
       if( event.key === "ArrowUp" ){
@@ -29,12 +26,12 @@ Handler.prototype = (function(){
       }
       
       if( vector ){
-        self.move(vector);
+        self.parent.move(vector);
       }
     }
   }
   
-  function _handleMouseDrag(self, setting){
+  function _handleMouseDrag(self){
     return function(event){
       const lock = self.getData("lock");
       const focusPos = self.getData("focusPos");
@@ -45,7 +42,7 @@ Handler.prototype = (function(){
     }
   }
   
-  function _handleMouseDown(self, setting){
+  function _handleMouseDown(self){
     return function(event){
       self.setData("lock", true);
       if( event.type === "mousedown" ){
@@ -62,7 +59,7 @@ Handler.prototype = (function(){
     }
   }
   
-  function _handleMouseUp(self, setting){
+  function _handleMouseUp(self){
     return function(event){
       if( self.move ){
         const lock = self.getData("lock");
@@ -101,17 +98,19 @@ Handler.prototype = (function(){
   }
 
   return {
-    handleKeyDown: function(setting){
-      return _handleKeyDown(this, setting);
+    handleKeyDown: function(){
+      return _handleKeyDown(this);
     },
-    handleMouseDown: function(status){
-      return _handleMouseDown(this, status);
+    handleMouseDown: function(){
+      return _handleMouseDown(this);
     },
-    handleMouseUp: function(status){
-      return _handleMouseUp(this, status);
+    handleMouseUp: function(){
+      return _handleMouseUp(this);
     },
-    handleMouseDrag: function(status){
-      return _handleMouseDrag(this, status);
+    handleMouseDrag: function(){
+      return _handleMouseDrag(this);
     }
   }
 })();
+
+export default Handler;

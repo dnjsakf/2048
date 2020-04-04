@@ -1,4 +1,4 @@
-// import Modal from './modules/Common/Modal.js'
+import Common from '/public/modules/Common/Common.js'
 
 const Modal = function(_config){
   const self = this;
@@ -17,8 +17,6 @@ const Modal = function(_config){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common]);
 }
 
 Modal.prototype = (function(){
@@ -99,7 +97,7 @@ Modal.prototype = (function(){
   function _initEvent(self){
     const wall = self.getDom("wall");
     
-    Common.event.bind(wall, "click", function(event){
+    Common.bindEvent(wall, "click", function(event){
       event.preventDefault();
       _close(self);
     }, false);
@@ -164,7 +162,7 @@ Modal.prototype = (function(){
       }
 
       if( btnOpt.onclick && typeof(btnOpt.onclick) === "function" ){
-        Common.event.bind(buttonEl, "click", btnOpt.onclick, false);
+        Common.bindEvent(buttonEl, "click", btnOpt.onclick, false);
       }
       /** Set Visibility **/
       const visible = typeof(btnOpt.visible) === 'undefined' || btnOpt.visible;
@@ -238,3 +236,5 @@ Modal.prototype = (function(){
     }
   }
 })();
+
+export default Modal;

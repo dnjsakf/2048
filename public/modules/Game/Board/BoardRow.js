@@ -1,3 +1,16 @@
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+
+
+const initConfig = {
+  parent: null,
+  index: null,
+  size: {
+    width: 100,
+    height: 100
+  },
+  cols: null
+}
+
 const BoardRow = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
@@ -80,12 +93,4 @@ BoardRow.prototype = (function(){
   }
 })();
 
-Common.bindElement(BoardRow, {
-  parent: null,
-  index: null,
-  size: {
-    width: 100,
-    height: 100
-  },
-  cols: null
-});
+export default bindElement(BoardRow, initConfig);

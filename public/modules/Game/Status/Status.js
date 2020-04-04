@@ -1,4 +1,11 @@
-// import Status from './modules/Status/Status.js'
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+
+import StatusMode from '/public/modules/Game/Status/StatusMode.js';
+import StatusScore from '/public/modules/Game/Status/StatusScore.js';
+
+const initConfig = {
+  parent: null
+}
 
 const Status = function(_config, _el){
   const self = this;
@@ -18,8 +25,6 @@ const Status = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common]);
 }
 
 Status.prototype = (function(){
@@ -72,10 +77,11 @@ Status.prototype = (function(){
   }
 
   function _getBoardSize(self){
+    const isMobile = Common.isMobile();
     const screen = self.getDom("screen");
     const boardSize = {
       width: screen.offsetWidth,
-      height: screen.offsetHeight - ( self.isMobile() ? self.el.offsetHeight : 0 )
+      height: screen.offsetHeight - ( isMobile ? self.el.offsetHeight : 0 )
     }
     return boardSize;
   }
@@ -130,6 +136,4 @@ Status.prototype = (function(){
   }
 })();
 
-Common.bindElement(Status, {
-  parent: null
-});
+export default bindElement(Status, initConfig);

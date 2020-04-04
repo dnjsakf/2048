@@ -1,5 +1,19 @@
-//import Handler from '/public/modules/Handler/Handler.js'
-//import Common from '/public/modules/Common/Common.js'
+import Modal from '/public/modules/Common/Modal/Modal.js';
+import Handler from '/public/modules/Common/Handler/Handler.js';
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+
+import BoardRow from '/public/modules/Game/Board/BoardRow.js';
+import BoardCol from '/public/modules/Game/Board/BoardCol.js';
+import RankingList from '/public/modules/Game/List/RankingList.js';
+
+
+const initBoardConfig = {
+  parent: null,
+  size: "medium",
+  defaultNumber: 2,
+  defaultCount: 2,
+  resize: true
+}
 
 const Board = function(_config, _el){
   const self = this;
@@ -20,7 +34,8 @@ const Board = function(_config, _el){
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
 
-  Common.extends.bind(self)([Common, Handler]);
+    
+  self.handler = new Handler(self);
 }
 
 Board.prototype = (function(){
@@ -94,20 +109,20 @@ Board.prototype = (function(){
   function _initEvent(self){
     _unbindEvent(self);
     
-    const onHandleKeyDown = self.handleKeyDown();
-    Common.event.bind(document, "keydown", onHandleKeyDown, false);
+    const onHandleKeyDown = self.handler.handleKeyDown();
+    Common.bindEvent(document, "keydown", onHandleKeyDown, false);
     
-    const onMouseDown = self.handleMouseDown();
-    Common.event.bind(self.el, "mousedown", onMouseDown, false);
+    const onMouseDown = self.handler.handleMouseDown();
+    Common.bindEvent(self.el, "mousedown", onMouseDown, false);
     
-    const onTouchDown = self.handleMouseDown();
-    Common.event.bind(self.el, "touchstart", onTouchDown, {passive:false});
+    const onTouchDown = self.handler.handleMouseDown();
+    Common.bindEvent(self.el, "touchstart", onTouchDown, {passive:false});
     
-    const onMouseUp = self.handleMouseUp();
-    Common.event.bind(document, "mouseup", onMouseUp, false);
+    const onMouseUp = self.handler.handleMouseUp();
+    Common.bindEvent(document, "mouseup", onMouseUp, false);
     
-    const onTouchUp = self.handleMouseUp();
-    Common.event.bind(document, "touchend", onTouchUp, {passive:false});
+    const onTouchUp = self.handler.handleMouseUp();
+    Common.bindEvent(document, "touchend", onTouchUp, {passive:false});
 
     const status = self.getInst("status");
     status.getInst("mode").onChange(function(event){
@@ -118,19 +133,19 @@ Board.prototype = (function(){
       event.target.blur();
     });
     
-    if( !self.isMobile() ){
-      Common.event.bind(window, "resize", _handleResize(self), false);
+    if( !Common.isMobile() ){
+      Common.bindEvent(window, "resize", _handleResize(self), false);
     }
   }
   
   function _unbindEvent(self){
-    Common.event.unbind(document, "keydown");
-    Common.event.unbind(self.el, "mousedown");
-    Common.event.unbind(self.el, "touchstart");
-    Common.event.unbind(document, "mouseup");
-    Common.event.unbind(document, "touchend");
-    Common.event.unbind(window, "resize");
-    Common.event.unbind(self.getInst("status").getInst("mode").el, "change");
+    Common.unbindEvent(document, "keydown");
+    Common.unbindEvent(self.el, "mousedown");
+    Common.unbindEvent(self.el, "touchstart");
+    Common.unbindEvent(document, "mouseup");
+    Common.unbindEvent(document, "touchend");
+    Common.unbindEvent(window, "resize");
+    Common.unbindEvent(self.getInst("status").getInst("mode").el, "change");
   }
 
   function _handleResize(self){
@@ -191,7 +206,7 @@ Board.prototype = (function(){
   
 
   function _checkResetMatrix(self, matrix, cross, reverse){
-    const crossedMatrix = self.crossArray(matrix, cross, reverse);
+    const crossedMatrix = Common.crossArray(matrix, cross, reverse);
     const resetCols = []
     
     let checker = 0;
@@ -230,12 +245,13 @@ Board.prototype = (function(){
   function _gameOver(self){
     _unbindEvent(self);
 
+    const isMobile = Common.isMobile();
+
     const status = self.getInst("status");
     const mode = status.getInst("mode");
     const score = status.getInst("score");
 
     const modeLabel = mode.getData("mode").label;
-    const isMobile = self.isMobile();
 
     const params = {
       mode: modeLabel,
@@ -266,9 +282,11 @@ Board.prototype = (function(){
 
               _saveRank(self, newRankData);
 
-              Common.event.unbind(event.target, "keydown");
+              Common.unbindEvent(event.target, "keydown");
             } else if ( event.keyCode === 27 ){
+
               _init(self);
+
               self.getInst("modal").close(true);
             }
           }
@@ -322,7 +340,7 @@ Board.prototype = (function(){
       score: data.score,
       name: data.name,
       mode: data.mode,
-      isMobile: self.isMobile()
+      isMobile: Common.isMobile()
     }
 
     const response = axios({
@@ -348,7 +366,10 @@ Board.prototype = (function(){
   function _checkGameOver(self){
     const matrix = self.getData("matrix");
 
-    const check_1 = _checkResetMatrix(self, matrix, cross, !reverse);
+    const reverse = true;
+    const cross = true;
+
+    const check_1 = _checkResetMatrix(self, matrix, cross, reverse);
     const check_2 = _checkResetMatrix(self, matrix, cross, !reverse);
     const check_3 = _checkResetMatrix(self, matrix, !cross, reverse);
     const check_4 = _checkResetMatrix(self, matrix, !cross, !reverse);
@@ -357,6 +378,8 @@ Board.prototype = (function(){
   }
   
   function _move(self, vector){
+    let reverse = null;
+    let cross = null;
     if( vector === "up" ){
       reverse = true;
       cross = true;
@@ -398,25 +421,8 @@ Board.prototype = (function(){
       if( vector ){
         _move(this, vector);
       }
-    },
-    reset: function(config){
-      const self = this;
-      if( config ){
-        const resetConfig = Object.assign({}, initBoardConfig, config);
-        
-        Object.keys(resetConfig).forEach((key)=>self.setConfig(key, resetConfig[key]));
-      }
-      _init(self);
     }
   }
 })();
 
-const initBoardConfig = {
-  parent: null,
-  size: "medium",
-  defaultNumber: 2,
-  defaultCount: 2,
-  resize: true
-}
-
-Common.bindElement(Board, initBoardConfig);
+export default bindElement(Board, initBoardConfig);

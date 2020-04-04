@@ -1,4 +1,9 @@
-// import StatusScore from './modules/Status/StatusScore.js'
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+
+
+const initConfig = {
+  parent: null
+}
 
 const StatusScore = function(_config, _el){
   const self = this;
@@ -19,8 +24,6 @@ const StatusScore = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common]);
 }
 
 StatusScore.prototype = (function(){
@@ -87,6 +90,4 @@ StatusScore.prototype = (function(){
   }
 })();
 
-Common.bindElement(StatusScore, {
-  parent: null,
-});
+export default bindElement(StatusScore, initConfig);

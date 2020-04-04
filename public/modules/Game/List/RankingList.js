@@ -1,4 +1,13 @@
-// import RankingList from './modules/List/RankingList.js'
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+
+
+const initConfig = {
+  parent: null,   // Instance
+  url: null,      // String
+  datas: {
+    list: null    // Array
+  }
+}
 
 const RankingList = function(_config, _el){
   const self = this;
@@ -18,8 +27,6 @@ const RankingList = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common]);
 }
 
 RankingList.prototype = (function(){
@@ -175,12 +182,13 @@ RankingList.prototype = (function(){
 
           self.setDom("newRankInput", input);
 
-          Common.event.bind(input, "keydown", self.getConfig("events").onKeyDown(data), false);
+          Common.bindEvent(input, "keydown", self.getConfig("events").onKeyDown(data), false);
         } else {
           /** Set Text **/  
           const text = data[column.name] || column.defaultText || ""
           const textEl = document.createElement("a");
           const textNode = document.createTextNode(text);
+          
           textEl.appendChild(textNode);
           col.appendChild(textEl);
         }
@@ -255,10 +263,4 @@ RankingList.prototype = (function(){
   }
 })();
 
-Common.bindElement(RankingList, {
-  parent: null,   // Instance
-  url: null,      // String
-  datas: {
-    list: null    // Array
-  }
-});
+export default bindElement(RankingList, initConfig);

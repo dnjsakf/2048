@@ -1,4 +1,9 @@
-// import StatusMode from './modules/Status/StatusMode.js'
+import Common, { bindElement } from '/public/modules/Common/Common.js'
+
+
+const initConfig = {
+  parent: null,
+}
 
 const StatusMode = function(_config, _el){
   const self = this;
@@ -19,8 +24,6 @@ const StatusMode = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common]);
 }
 
 StatusMode.prototype = (function(){
@@ -125,7 +128,7 @@ StatusMode.prototype = (function(){
   function _handleChangeMode(self, handler){
     const select = self.getDom("select");
 
-    Common.event.bind(select, "change", handler.bind(self), false);
+    Common.bindEvent(select, "change", handler.bind(self), false);
   }
 
   return {
@@ -150,6 +153,4 @@ StatusMode.prototype = (function(){
   }
 })();
 
-Common.bindElement(StatusMode, {
-  parent: null,
-});
+export default bindElement(StatusMode, initConfig);

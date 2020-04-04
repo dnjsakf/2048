@@ -1,3 +1,6 @@
+import Common, { bindElement } from '/public/modules/Common/Common.js';
+import Handler from '/public/modules/Common/Handler/Handler.js';
+
 const BoardCol = function(_config, _el){
   const self = this;
   const config = Object.assign({}, _config);
@@ -16,8 +19,6 @@ const BoardCol = function(_config, _el){
   self.getInst = (k)=>insts[k];
   self.setDom = (k,v)=>{ doms[k] = v; }
   self.getDom = (k)=>doms[k];
-
-  Common.extends.bind(self)([Common,Handler]);
 }
 
 BoardCol.prototype = (function(){
@@ -89,10 +90,10 @@ BoardCol.prototype = (function(){
       const text = document.createTextNode(number);
       a.appendChild(text);
   
-      self.el.style.backgroundColor = `rgba(255, 71, 0, ${self.getAlpha(number)*2}%)`;
+      self.el.style.backgroundColor = `rgba(255, 71, 0, ${Common.getAlpha(number)*2}%)`;
       self.el.appendChild(a);
 
-      self.animate(self.el, "pulse");
+      Common.animate(self.el, "pulse");
     }
     
     self.setData("number", number);
@@ -114,11 +115,13 @@ BoardCol.prototype = (function(){
   }
 })();
 
-Common.bindElement(BoardCol, {
+const initConfig = {
   parent: null,
   index: null,
   size: {
     width: 100,
     height: 100
   }
-});
+}
+
+export default bindElement(BoardCol, initConfig);
